@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>心情豆豆 🫘 Mood Calendar</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800&display=swap');
-
     :root {
       --bg: #fdf0e8;
       --card: #fff8f2;
@@ -14,28 +12,26 @@
       --text: #3a2a20;
       --muted: #a08070;
       --shadow: rgba(180,120,80,0.12);
-
-      --mood1: #c8e6c9; /* 很差 - 绿灰 */
-      --mood2: #fff9c4; /* 不好 - 黄 */
-      --mood3: #ffe0b2; /* 一般 - 橙 */
-      --mood4: #f8bbd0; /* 不错 - 粉 */
-      --mood5: #e1bee7; /* 很棒 - 紫 */
+      --mood1: #c8e6c9;
+      --mood2: #fff9c4;
+      --mood3: #ffe0b2;
+      --mood4: #f8bbd0;
+      --mood5: #e1bee7;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Nunito', sans-serif;
+      font-family: 'Nunito', 'PingFang SC', sans-serif;
       background: var(--bg);
       background-image:
         radial-gradient(circle at 20% 20%, #fde8d8 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, #e8d8f0 0%, transparent 50%);
       min-height: 100vh;
       color: var(--text);
-      padding: 24px 16px 60px;
+      padding: 24px 16px 80px;
     }
 
-    /* ── felt texture overlay ── */
     body::before {
       content: '';
       position: fixed;
@@ -47,79 +43,75 @@
 
     .wrap { max-width: 480px; margin: 0 auto; position: relative; z-index: 1; }
 
-    /* ── Header ── */
     header { text-align: center; margin-bottom: 28px; }
-    header .title {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: 0.02em;
-    }
-    header .subtitle {
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-    .bean-deco {
-      font-size: 2.2rem;
-      display: block;
-      margin-bottom: 4px;
-      animation: wobble 3s ease-in-out infinite;
-    }
-    @keyframes wobble {
-      0%,100% { transform: rotate(-5deg); }
-      50% { transform: rotate(5deg); }
-    }
+    .bean-deco { font-size: 2.4rem; display: block; margin-bottom: 4px; animation: wobble 3s ease-in-out infinite; }
+    @keyframes wobble { 0%,100%{transform:rotate(-6deg)} 50%{transform:rotate(6deg)} }
+    .title { font-size: 2rem; font-weight: 800; }
+    .subtitle { font-size: 0.88rem; color: var(--muted); margin-top: 4px; }
 
-    /* ── Mood Picker ── */
-    .mood-card {
+    /* ── Card ── */
+    .card {
       background: var(--card);
       border-radius: 24px;
       padding: 24px;
       border: 2.5px solid var(--border);
       box-shadow: 0 6px 24px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.8);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
-    .mood-card h2 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 16px;
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 800;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
     }
 
-    .today-date {
-      font-size: 1.3rem;
+    .editing-date {
+      font-size: 1.2rem;
       font-weight: 800;
-      margin-bottom: 20px;
-      color: var(--text);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
+    .editing-date .back-btn {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.15s;
+    }
+    .editing-date .back-btn:hover { border-color: #c09070; color: var(--text); }
+
+    /* ── Mood Options ── */
     .mood-options {
       display: flex;
       justify-content: space-between;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .mood-btn {
       flex: 1;
-      aspect-ratio: 1;
       border: 2.5px solid transparent;
-      border-radius: 18px;
+      border-radius: 20px;
       background: white;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      padding: 10px 4px 8px;
+      gap: 6px;
       transition: all 0.18s ease;
       box-shadow: 0 3px 10px var(--shadow);
-      font-size: 1.8rem;
       position: relative;
       overflow: hidden;
     }
@@ -128,26 +120,32 @@
       content: '';
       position: absolute;
       inset: 0;
-      border-radius: 16px;
+      border-radius: 18px;
       opacity: 0;
       transition: opacity 0.18s;
     }
-
     .mood-btn[data-mood="1"]::before { background: var(--mood1); }
     .mood-btn[data-mood="2"]::before { background: var(--mood2); }
     .mood-btn[data-mood="3"]::before { background: var(--mood3); }
     .mood-btn[data-mood="4"]::before { background: var(--mood4); }
     .mood-btn[data-mood="5"]::before { background: var(--mood5); }
+    .mood-btn:hover::before, .mood-btn.selected::before { opacity: 1; }
 
-    .mood-btn:hover::before,
-    .mood-btn.selected::before { opacity: 1; }
+    /* Custom illustrated mood faces */
+    .mood-face {
+      position: relative;
+      z-index: 1;
+      width: 44px;
+      height: 44px;
+    }
 
-    .mood-btn span { position: relative; z-index: 1; }
     .mood-btn .label {
-      font-size: 0.6rem;
-      font-weight: 700;
+      position: relative;
+      z-index: 1;
+      font-size: 0.62rem;
+      font-weight: 800;
       color: var(--muted);
-      letter-spacing: 0.03em;
+      letter-spacing: 0.02em;
     }
 
     .mood-btn.selected {
@@ -155,23 +153,23 @@
       transform: scale(1.08);
       box-shadow: 0 6px 20px var(--shadow);
     }
-
     .mood-btn:hover { transform: scale(1.05); }
     .mood-btn.selected:hover { transform: scale(1.08); }
 
+    /* ── Note + Save ── */
     .note-input {
       width: 100%;
       border: 2px solid var(--border);
       border-radius: 14px;
-      padding: 12px 16px;
-      font-family: 'Nunito', sans-serif;
+      padding: 11px 14px;
       font-size: 0.9rem;
       color: var(--text);
       background: white;
       resize: none;
       outline: none;
       transition: border-color 0.15s;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
+      font-family: inherit;
     }
     .note-input:focus { border-color: #c09070; }
     .note-input::placeholder { color: #c0a898; }
@@ -182,46 +180,32 @@
       border: none;
       border-radius: 14px;
       color: white;
-      font-family: 'Nunito', sans-serif;
       font-size: 1rem;
       font-weight: 800;
-      padding: 14px;
+      padding: 13px;
       cursor: pointer;
       transition: all 0.18s;
       box-shadow: 0 4px 14px rgba(212,132,154,0.35);
-      letter-spacing: 0.03em;
+      font-family: inherit;
     }
     .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(212,132,154,0.4); }
     .save-btn:active { transform: translateY(0); }
-    .save-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .save-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
     /* ── Calendar ── */
-    .cal-card {
-      background: var(--card);
-      border-radius: 24px;
-      padding: 24px;
-      border: 2.5px solid var(--border);
-      box-shadow: 0 6px 24px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.8);
-    }
-
     .cal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
-
-    .cal-header h2 {
-      font-size: 1.1rem;
-      font-weight: 800;
-    }
-
+    .cal-title { font-size: 1.1rem; font-weight: 800; }
     .nav-btn {
       background: white;
       border: 2px solid var(--border);
       border-radius: 10px;
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       cursor: pointer;
       font-size: 1rem;
       display: flex;
@@ -230,26 +214,26 @@
       transition: all 0.15s;
       color: var(--text);
     }
-    .nav-btn:hover { background: var(--bg); border-color: #c09070; }
+    .nav-btn:hover { border-color: #c09070; }
 
     .weekdays {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      margin-bottom: 8px;
+      grid-template-columns: repeat(7,1fr);
+      margin-bottom: 6px;
     }
     .weekday {
       text-align: center;
-      font-size: 0.7rem;
-      font-weight: 700;
+      font-size: 0.68rem;
+      font-weight: 800;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       padding: 4px 0;
     }
 
     .days-grid {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(7,1fr);
       gap: 4px;
     }
 
@@ -262,33 +246,25 @@
       justify-content: center;
       cursor: pointer;
       transition: all 0.15s;
-      position: relative;
       background: white;
       border: 2px solid transparent;
+      position: relative;
     }
-
-    .day-cell:hover { border-color: #c09070; transform: scale(1.05); }
-
+    .day-cell:hover { border-color: #c09070; transform: scale(1.07); z-index: 2; }
     .day-cell.empty { background: transparent; cursor: default; border: none; }
     .day-cell.empty:hover { transform: none; }
-
     .day-cell.today { border-color: #d4849a !important; }
+    .day-cell.future { opacity: 0.4; cursor: not-allowed; }
+    .day-cell.future:hover { transform: none; border-color: transparent; }
 
     .day-cell .day-num {
-      font-size: 0.72rem;
-      font-weight: 700;
+      font-size: 0.68rem;
+      font-weight: 800;
       color: var(--muted);
       line-height: 1;
     }
+    .day-cell .day-face { font-size: 1.25rem; line-height: 1; }
 
-    .day-cell .day-emoji {
-      font-size: 1.3rem;
-      line-height: 1;
-    }
-
-    .day-cell.has-mood {
-      border-color: transparent;
-    }
     .day-cell[data-mood="1"] { background: var(--mood1); }
     .day-cell[data-mood="2"] { background: var(--mood2); }
     .day-cell[data-mood="3"] { background: var(--mood3); }
@@ -299,23 +275,32 @@
     .legend {
       display: flex;
       justify-content: center;
-      gap: 12px;
-      margin-top: 18px;
+      gap: 10px;
+      margin-top: 16px;
       flex-wrap: wrap;
     }
     .legend-item {
       display: flex;
       align-items: center;
       gap: 5px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--muted);
-      font-weight: 600;
+      font-weight: 700;
     }
-    .legend-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+    /* ── Stats ── */
+    .stats { display: flex; gap: 10px; margin-top: 16px; }
+    .stat-chip {
+      flex: 1;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 11px 6px;
+      text-align: center;
     }
+    .stat-val { font-size: 1.4rem; font-weight: 800; display: block; }
+    .stat-label { font-size: 0.65rem; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
 
     /* ── Toast ── */
     .toast {
@@ -328,7 +313,7 @@
       border-radius: 14px;
       padding: 12px 24px;
       font-size: 0.9rem;
-      font-weight: 700;
+      font-weight: 800;
       transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
       z-index: 100;
       white-space: nowrap;
@@ -340,42 +325,15 @@
       position: fixed;
       background: #3a2a20;
       color: white;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 0.82rem;
+      border-radius: 10px;
+      padding: 9px 13px;
+      font-size: 0.8rem;
       font-weight: 600;
       pointer-events: none;
       z-index: 50;
       max-width: 180px;
-      line-height: 1.4;
+      line-height: 1.5;
       display: none;
-    }
-
-    /* ── Stats ── */
-    .stats {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
-    }
-    .stat-chip {
-      flex: 1;
-      background: white;
-      border: 2px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 8px;
-      text-align: center;
-    }
-    .stat-chip .stat-val {
-      font-size: 1.4rem;
-      font-weight: 800;
-      display: block;
-    }
-    .stat-chip .stat-label {
-      font-size: 0.68rem;
-      color: var(--muted);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
     }
   </style>
 </head>
@@ -388,54 +346,86 @@
     <div class="subtitle">每天记录一粒心情，慢慢装满日历</div>
   </header>
 
-  <!-- Mood Picker -->
-  <div class="mood-card">
-    <h2>今天怎么样？</h2>
-    <div class="today-date" id="todayLabel"></div>
+  <!-- Picker Card -->
+  <div class="card" id="pickerCard">
+    <div class="section-label" id="pickerLabel">今天怎么样？</div>
+    <div class="editing-date" id="editingDate"></div>
+
     <div class="mood-options">
+      <!-- SVG illustrated faces -->
       <button class="mood-btn" data-mood="1">
-        <span>😞</span>
+        <svg class="mood-face" viewBox="0 0 44 44" fill="none">
+          <circle cx="22" cy="22" r="20" fill="#a5d6a7" stroke="#81c784" stroke-width="2"/>
+          <circle cx="16" cy="19" r="2.5" fill="#3a2a20"/>
+          <circle cx="28" cy="19" r="2.5" fill="#3a2a20"/>
+          <path d="M15 30 Q22 24 29 30" stroke="#3a2a20" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M14 16 Q16 13 18 16" stroke="#3a2a20" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <path d="M26 16 Q28 13 30 16" stroke="#3a2a20" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        </svg>
         <span class="label">很差</span>
       </button>
       <button class="mood-btn" data-mood="2">
-        <span>😕</span>
+        <svg class="mood-face" viewBox="0 0 44 44" fill="none">
+          <circle cx="22" cy="22" r="20" fill="#fff176" stroke="#fdd835" stroke-width="2"/>
+          <circle cx="16" cy="19" r="2.5" fill="#3a2a20"/>
+          <circle cx="28" cy="19" r="2.5" fill="#3a2a20"/>
+          <path d="M15 29 Q22 26 29 29" stroke="#3a2a20" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
         <span class="label">不好</span>
       </button>
       <button class="mood-btn" data-mood="3">
-        <span>😐</span>
+        <svg class="mood-face" viewBox="0 0 44 44" fill="none">
+          <circle cx="22" cy="22" r="20" fill="#ffcc80" stroke="#ffa726" stroke-width="2"/>
+          <circle cx="16" cy="19" r="2.5" fill="#3a2a20"/>
+          <circle cx="28" cy="19" r="2.5" fill="#3a2a20"/>
+          <line x1="15" y1="29" x2="29" y2="29" stroke="#3a2a20" stroke-width="2" stroke-linecap="round"/>
+        </svg>
         <span class="label">一般</span>
       </button>
       <button class="mood-btn" data-mood="4">
-        <span>🙂</span>
+        <svg class="mood-face" viewBox="0 0 44 44" fill="none">
+          <circle cx="22" cy="22" r="20" fill="#f48fb1" stroke="#e91e8c" stroke-width="2"/>
+          <circle cx="16" cy="18" r="2.5" fill="#3a2a20"/>
+          <circle cx="28" cy="18" r="2.5" fill="#3a2a20"/>
+          <path d="M15 26 Q22 33 29 26" stroke="#3a2a20" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="14" cy="24" r="3" fill="#ff80ab" opacity="0.6"/>
+          <circle cx="30" cy="24" r="3" fill="#ff80ab" opacity="0.6"/>
+        </svg>
         <span class="label">不错</span>
       </button>
       <button class="mood-btn" data-mood="5">
-        <span>🥰</span>
+        <svg class="mood-face" viewBox="0 0 44 44" fill="none">
+          <circle cx="22" cy="22" r="20" fill="#ce93d8" stroke="#ab47bc" stroke-width="2"/>
+          <circle cx="16" cy="17" r="2.8" fill="#3a2a20"/>
+          <circle cx="28" cy="17" r="2.8" fill="#3a2a20"/>
+          <circle cx="17" cy="16" r="1" fill="white"/>
+          <circle cx="29" cy="16" r="1" fill="white"/>
+          <path d="M13 25 Q22 35 31 25" stroke="#3a2a20" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          <circle cx="13" cy="23" r="3.5" fill="#f06292" opacity="0.55"/>
+          <circle cx="31" cy="23" r="3.5" fill="#f06292" opacity="0.55"/>
+          <path d="M19 10 L20 7 L21 10" stroke="#ab47bc" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <path d="M23 9 L24 6 L25 9" stroke="#ab47bc" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        </svg>
         <span class="label">很棒</span>
       </button>
     </div>
-    <textarea class="note-input" id="noteInput" rows="2" placeholder="写点什么... （可选）"></textarea>
-    <button class="save-btn" id="saveBtn" disabled>保存今天的心情 ✨</button>
+
+    <textarea class="note-input" id="noteInput" rows="2" placeholder="写点什么...（可选）"></textarea>
+    <button class="save-btn" id="saveBtn" disabled>保存心情 ✨</button>
   </div>
 
-  <!-- Calendar -->
-  <div class="cal-card">
+  <!-- Calendar Card -->
+  <div class="card">
     <div class="cal-header">
       <button class="nav-btn" id="prevBtn">‹</button>
-      <h2 id="calTitle"></h2>
+      <div class="cal-title" id="calTitle"></div>
       <button class="nav-btn" id="nextBtn">›</button>
     </div>
     <div class="weekdays">
-      <div class="weekday">日</div>
-      <div class="weekday">一</div>
-      <div class="weekday">二</div>
-      <div class="weekday">三</div>
-      <div class="weekday">四</div>
-      <div class="weekday">五</div>
-      <div class="weekday">六</div>
+      <div class="weekday">日</div><div class="weekday">一</div><div class="weekday">二</div>
+      <div class="weekday">三</div><div class="weekday">四</div><div class="weekday">五</div><div class="weekday">六</div>
     </div>
     <div class="days-grid" id="daysGrid"></div>
-
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--mood1)"></div>很差</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--mood2)"></div>不好</div>
@@ -443,56 +433,70 @@
       <div class="legend-item"><div class="legend-dot" style="background:var(--mood4)"></div>不错</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--mood5)"></div>很棒</div>
     </div>
-
     <div class="stats" id="statsRow"></div>
   </div>
 
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
-<!-- Tooltip -->
 <div class="tooltip" id="tooltip"></div>
 
 <script>
   const MOODS = {
-    1: { emoji: '😞', label: '很差', color: 'var(--mood1)' },
-    2: { emoji: '😕', label: '不好', color: 'var(--mood2)' },
-    3: { emoji: '😐', label: '一般', color: 'var(--mood3)' },
-    4: { emoji: '🙂', label: '不错', color: 'var(--mood4)' },
-    5: { emoji: '🥰', label: '很棒', color: 'var(--mood5)' },
+    1: { label: '很差', svgFace: `<svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="20" fill="#a5d6a7" stroke="#81c784" stroke-width="2"/><circle cx="16" cy="19" r="2.5" fill="#3a2a20"/><circle cx="28" cy="19" r="2.5" fill="#3a2a20"/><path d="M15 30 Q22 24 29 30" stroke="#3a2a20" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M14 16 Q16 13 18 16" stroke="#3a2a20" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M26 16 Q28 13 30 16" stroke="#3a2a20" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>` },
+    2: { label: '不好', svgFace: `<svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="20" fill="#fff176" stroke="#fdd835" stroke-width="2"/><circle cx="16" cy="19" r="2.5" fill="#3a2a20"/><circle cx="28" cy="19" r="2.5" fill="#3a2a20"/><path d="M15 29 Q22 26 29 29" stroke="#3a2a20" stroke-width="2" stroke-linecap="round" fill="none"/></svg>` },
+    3: { label: '一般', svgFace: `<svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="20" fill="#ffcc80" stroke="#ffa726" stroke-width="2"/><circle cx="16" cy="19" r="2.5" fill="#3a2a20"/><circle cx="28" cy="19" r="2.5" fill="#3a2a20"/><line x1="15" y1="29" x2="29" y2="29" stroke="#3a2a20" stroke-width="2" stroke-linecap="round"/></svg>` },
+    4: { label: '不错', svgFace: `<svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="20" fill="#f48fb1" stroke="#e91e8c" stroke-width="2"/><circle cx="16" cy="18" r="2.5" fill="#3a2a20"/><circle cx="28" cy="18" r="2.5" fill="#3a2a20"/><path d="M15 26 Q22 33 29 26" stroke="#3a2a20" stroke-width="2" stroke-linecap="round" fill="none"/><circle cx="14" cy="24" r="3" fill="#ff80ab" opacity="0.6"/><circle cx="30" cy="24" r="3" fill="#ff80ab" opacity="0.6"/></svg>` },
+    5: { label: '很棒', svgFace: `<svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="20" fill="#ce93d8" stroke="#ab47bc" stroke-width="2"/><circle cx="16" cy="17" r="2.8" fill="#3a2a20"/><circle cx="28" cy="17" r="2.8" fill="#3a2a20"/><circle cx="17" cy="16" r="1" fill="white"/><circle cx="29" cy="16" r="1" fill="white"/><path d="M13 25 Q22 35 31 25" stroke="#3a2a20" stroke-width="2.2" stroke-linecap="round" fill="none"/><circle cx="13" cy="23" r="3.5" fill="#f06292" opacity="0.55"/><circle cx="31" cy="23" r="3.5" fill="#f06292" opacity="0.55"/><path d="M19 10 L20 7 L21 10" stroke="#ab47bc" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M23 9 L24 6 L25 9" stroke="#ab47bc" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>` },
   };
 
-  // Storage
-  function getData() {
-    return JSON.parse(localStorage.getItem('moodData') || '{}');
-  }
-  function setData(d) {
-    localStorage.setItem('moodData', JSON.stringify(d));
-  }
-  function dateKey(y, m, d) {
-    return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-  }
+  function getData() { return JSON.parse(localStorage.getItem('moodData2') || '{}'); }
+  function setData(d) { localStorage.setItem('moodData2', JSON.stringify(d)); }
+  function dateKey(y, m, d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
 
-  // State
   const now = new Date();
   let viewYear = now.getFullYear();
   let viewMonth = now.getMonth();
+  let editingKey = dateKey(now.getFullYear(), now.getMonth(), now.getDate());
   let selectedMood = null;
 
-  // Today label
-  const todayLabel = document.getElementById('todayLabel');
-  todayLabel.textContent = now.toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
+  function setEditingDate(key) {
+    editingKey = key;
+    selectedMood = null;
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('noteInput').value = '';
+    document.getElementById('saveBtn').disabled = true;
 
-  // Pre-fill today if exists
-  const todayKey = dateKey(now.getFullYear(), now.getMonth(), now.getDate());
-  const existing = getData()[todayKey];
-  if (existing) {
-    selectedMood = existing.mood;
-    document.querySelector(`.mood-btn[data-mood="${selectedMood}"]`).classList.add('selected');
-    document.getElementById('noteInput').value = existing.note || '';
-    document.getElementById('saveBtn').disabled = false;
+    const isToday = key === dateKey(now.getFullYear(), now.getMonth(), now.getDate());
+    const [y, m, d] = key.split('-');
+    const dateObj = new Date(parseInt(y), parseInt(m)-1, parseInt(d));
+    const label = isToday ? '今天 · ' + dateObj.toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'short'})
+      : dateObj.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+
+    const editingDateEl = document.getElementById('editingDate');
+    document.getElementById('pickerLabel').textContent = isToday ? '今天怎么样？' : '编辑这一天';
+
+    if (!isToday) {
+      editingDateEl.innerHTML = `<span>${label}</span><button class="back-btn" id="backToToday">回到今天</button>`;
+      document.getElementById('backToToday').addEventListener('click', () => {
+        setEditingDate(dateKey(now.getFullYear(), now.getMonth(), now.getDate()));
+      });
+    } else {
+      editingDateEl.textContent = label;
+    }
+
+    // pre-fill existing
+    const existing = getData()[key];
+    if (existing) {
+      selectedMood = existing.mood;
+      document.querySelector(`.mood-btn[data-mood="${selectedMood}"]`).classList.add('selected');
+      document.getElementById('noteInput').value = existing.note || '';
+      document.getElementById('saveBtn').disabled = false;
+    }
   }
+
+  // Init
+  setEditingDate(editingKey);
 
   // Mood buttons
   document.querySelectorAll('.mood-btn').forEach(btn => {
@@ -508,13 +512,12 @@
   document.getElementById('saveBtn').addEventListener('click', () => {
     if (!selectedMood) return;
     const data = getData();
-    data[todayKey] = { mood: selectedMood, note: document.getElementById('noteInput').value, ts: Date.now() };
+    data[editingKey] = { mood: selectedMood, note: document.getElementById('noteInput').value, ts: Date.now() };
     setData(data);
     renderCalendar();
-    showToast(`${MOODS[selectedMood].emoji} 已记录！`);
+    showToast(`${MOODS[selectedMood].label} · 已保存 ✨`);
   });
 
-  // Toast
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -522,88 +525,81 @@
     setTimeout(() => t.classList.remove('show'), 2200);
   }
 
-  // Calendar
   function renderCalendar() {
     const data = getData();
-    const title = `${viewYear} 年 ${viewMonth + 1} 月`;
-    document.getElementById('calTitle').textContent = title;
-
+    document.getElementById('calTitle').textContent = `${viewYear} 年 ${viewMonth+1} 月`;
     const grid = document.getElementById('daysGrid');
     grid.innerHTML = '';
 
     const firstDay = new Date(viewYear, viewMonth, 1).getDay();
-    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+    const todayKey = dateKey(now.getFullYear(), now.getMonth(), now.getDate());
 
-    // Empty cells
     for (let i = 0; i < firstDay; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'day-cell empty';
-      grid.appendChild(cell);
+      const c = document.createElement('div');
+      c.className = 'day-cell empty';
+      grid.appendChild(c);
     }
 
-    // Day cells
     for (let d = 1; d <= daysInMonth; d++) {
       const key = dateKey(viewYear, viewMonth, d);
       const entry = data[key];
+      const isFuture = key > todayKey;
+      const isToday = key === todayKey;
       const cell = document.createElement('div');
-      cell.className = 'day-cell';
-
-      const isToday = viewYear === now.getFullYear() && viewMonth === now.getMonth() && d === now.getDate();
-      if (isToday) cell.classList.add('today');
+      cell.className = 'day-cell' + (isToday ? ' today' : '') + (isFuture ? ' future' : '');
 
       if (entry) {
-        cell.classList.add('has-mood');
         cell.dataset.mood = entry.mood;
-        cell.innerHTML = `<span class="day-emoji">${MOODS[entry.mood].emoji}</span><span class="day-num">${d}</span>`;
-
-        // Tooltip
-        cell.addEventListener('mouseenter', (e) => {
-          const tip = document.getElementById('tooltip');
-          tip.innerHTML = `<strong>${key}</strong><br>${MOODS[entry.mood].label}${entry.note ? '<br><em>' + entry.note + '</em>' : ''}`;
-          tip.style.display = 'block';
-          tip.style.left = (e.clientX + 10) + 'px';
-          tip.style.top = (e.clientY - 60) + 'px';
-        });
-        cell.addEventListener('mousemove', (e) => {
-          const tip = document.getElementById('tooltip');
-          tip.style.left = (e.clientX + 10) + 'px';
-          tip.style.top = (e.clientY - 60) + 'px';
-        });
-        cell.addEventListener('mouseleave', () => {
-          document.getElementById('tooltip').style.display = 'none';
-        });
+        cell.innerHTML = `<div class="day-face" style="width:28px;height:28px;">${MOODS[entry.mood].svgFace}</div><span class="day-num">${d}</span>`;
       } else {
         cell.innerHTML = `<span class="day-num">${d}</span>`;
+      }
+
+      if (!isFuture) {
+        cell.addEventListener('click', () => {
+          setEditingDate(key);
+          document.getElementById('pickerCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        if (entry) {
+          cell.addEventListener('mouseenter', (e) => {
+            const tip = document.getElementById('tooltip');
+            tip.innerHTML = `<strong>${key}</strong><br>${MOODS[entry.mood].label}${entry.note ? '<br><em>' + entry.note + '</em>' : ''}`;
+            tip.style.display = 'block';
+            tip.style.left = (e.clientX + 10) + 'px';
+            tip.style.top = (e.clientY - 70) + 'px';
+          });
+          cell.addEventListener('mousemove', (e) => {
+            const tip = document.getElementById('tooltip');
+            tip.style.left = (e.clientX + 10) + 'px';
+            tip.style.top = (e.clientY - 70) + 'px';
+          });
+          cell.addEventListener('mouseleave', () => { document.getElementById('tooltip').style.display = 'none'; });
+        }
       }
 
       grid.appendChild(cell);
     }
 
-    renderStats(data);
-  }
-
-  function renderStats(data) {
+    // Stats
     const keys = Object.keys(data).filter(k => k.startsWith(`${viewYear}-${String(viewMonth+1).padStart(2,'0')}`));
     const total = keys.length;
     const avg = total ? (keys.reduce((s,k) => s + data[k].mood, 0) / total).toFixed(1) : '—';
     const best = total ? Math.max(...keys.map(k => data[k].mood)) : null;
-
-    const row = document.getElementById('statsRow');
-    row.innerHTML = `
+    document.getElementById('statsRow').innerHTML = `
       <div class="stat-chip"><span class="stat-val">${total}</span><span class="stat-label">已记录</span></div>
       <div class="stat-chip"><span class="stat-val">${avg}</span><span class="stat-label">平均心情</span></div>
-      <div class="stat-chip"><span class="stat-val">${best ? MOODS[best].emoji : '—'}</span><span class="stat-label">最好的天</span></div>
+      <div class="stat-chip"><span class="stat-val" style="font-size:1.6rem">${best ? `<div style="width:28px;height:28px;display:inline-block">${MOODS[best].svgFace}</div>` : '—'}</span><span class="stat-label">最好的天</span></div>
     `;
   }
 
   document.getElementById('prevBtn').addEventListener('click', () => {
-    viewMonth--;
-    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    if (--viewMonth < 0) { viewMonth = 11; viewYear--; }
     renderCalendar();
   });
   document.getElementById('nextBtn').addEventListener('click', () => {
-    viewMonth++;
-    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    if (++viewMonth > 11) { viewMonth = 0; viewYear++; }
     renderCalendar();
   });
 
