@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>雅历 · 中华节假日日历</title>
+<title>麦子日历</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -100,16 +100,22 @@
     padding: 1rem 1.5rem; border-radius: 0 6px 6px 0;
     min-height: 4rem; font-size: 0.88rem; color: var(--ink-light);
   }
-  .info-panel .info-title { font-size: 1rem; color: var(--ink); margin-bottom: 0.4rem; font-weight: 400; }
-  .info-panel .info-row { margin-top: 0.25rem; }
+  .upcoming-item {
+    display: flex; align-items: baseline; gap: 1rem;
+    padding: 0.7rem 0; border-bottom: 1px solid var(--paper-warm);
+  }
+  .upcoming-item:last-child { border-bottom: none; }
+  .upcoming-name { font-size: 0.95rem; color: var(--ink); min-width: 4rem; }
+  .upcoming-date { font-size: 0.82rem; color: var(--ink-light); }
+  .upcoming-days { margin-left: auto; font-size: 0.82rem; color: var(--holiday-text); background: var(--holiday-bg); padding: 2px 8px; border-radius: 10px; }
 </style>
 </head>
 <body>
 <a class="back-link" href="../../index.html">← 主页</a>
 
 <header>
-  <h1>雅　历</h1>
-  <div class="subtitle">中华节假日 · 农历 · 节气</div>
+  <h1>麦子日历</h1>
+  <div class="subtitle">节假日 · 农历 · 节气</div>
 </header>
 
 <div class="nav">
@@ -134,6 +140,12 @@
 <div class="divider"></div>
 <div class="info-panel" id="infoPanel">
   <div style="color:var(--ink-faint)">点击日期查看详情</div>
+</div>
+
+<div class="divider"></div>
+<div class="upcoming-wrap" style="max-width:640px;width:100%">
+  <div style="font-size:0.82rem;color:var(--ink-faint);letter-spacing:0.15em;margin-bottom:0.8rem">即将放假</div>
+  <div id="upcomingList"></div>
 </div>
 
 <script>
@@ -208,6 +220,45 @@ function getLunar(date){
   } catch(e){ return ''; }
 }
 
+function renderUpcoming(){
+  const list = document.getElementById('upcomingList');
+  // collect holiday groups: find first day of each holiday block after today
+  const todayKey = key(today.getFullYear(), today.getMonth(), today.getDate());
+  const seen = new Set();
+  const upcoming = [];
+  // scan next 400 days
+  for(let i=0; i<400; i++){
+    const d = new Date(today); d.setDate(today.getDate()+i);
+    const k = key(d.getFullYear(), d.getMonth(), d.getDate());
+    if(HOLIDAYS[k]){
+      const name = HOLIDAYS[k].name;
+      if(!seen.has(name)){
+        seen.add(name);
+        // count consecutive days
+        let count=0, dd=new Date(d);
+        while(true){
+          const kk=key(dd.getFullYear(),dd.getMonth(),dd.getDate());
+          if(HOLIDAYS[kk]&&HOLIDAYS[kk].name===name){ count++; dd.setDate(dd.getDate()+1); }
+          else break;
+        }
+        const diff = Math.round((d-today)/(1000*60*60*24));
+        upcoming.push({name, date:d, count, diff});
+        if(upcoming.length>=5) break;
+      }
+    }
+  }
+  if(!upcoming.length){ list.innerHTML='<div style="color:var(--ink-faint);font-size:0.85rem">暂无数据</div>'; return; }
+  list.innerHTML = upcoming.map(u=>{
+    const mo = u.date.getMonth()+1, da = u.date.getDate();
+    const diffText = u.diff===0 ? '今天' : u.diff===1 ? '明天' : `${u.diff} 天后`;
+    return `<div class="upcoming-item">
+      <span class="upcoming-name">${u.name}</span>
+      <span class="upcoming-date">${u.date.getFullYear()}年${mo}月${da}日起 · ${u.count}天</span>
+      <span class="upcoming-days">${diffText}</span>
+    </div>`;
+  }).join('');
+}
+
 function render(){
   document.getElementById('monthLabel').textContent = `${curYear} 年 ${curMonth+1} 月`;
   const grid = document.getElementById('daysGrid');
@@ -263,6 +314,10 @@ function changeMonth(dir){
 }
 
 render();
-</script>
+renderUpcoming();
+// auto select today
+const todayEl = document.querySelector('.day.today');
+if(todayEl) todayEl.click();
+
 </body>
 </html>
