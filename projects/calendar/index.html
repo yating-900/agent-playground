@@ -20,32 +20,24 @@
     font-family: 'Noto Serif SC', 'STSong', serif;
     background: var(--paper); color: var(--ink);
     min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; padding: 2rem 1rem 4rem;
+    align-items: center; padding: 1.5rem 1rem 3rem;
   }
   .back-link {
-    position: fixed; top: 1rem; left: 1rem;
+    position: fixed; top: 0.8rem; left: 1rem;
     font-size: 0.85rem; color: var(--ink-faint);
     text-decoration: none; letter-spacing: 0.05em; z-index: 100;
   }
   .back-link:hover { color: var(--ink); }
-  header { text-align: center; margin-bottom: 2.5rem; }
-  header h1 { font-size: 2rem; font-weight: 300; letter-spacing: 0.4em; margin-bottom: 0.4rem; }
-  header .subtitle { font-size: 0.82rem; color: var(--ink-faint); letter-spacing: 0.2em; }
-  .nav { display: flex; align-items: center; gap: 2.5rem; margin-bottom: 2rem; }
+  header { text-align: center; margin-bottom: 1.2rem; }
+  header h1 { font-size: 1.8rem; font-weight: 300; letter-spacing: 0.4em; }
+  .nav { display: flex; align-items: center; gap: 2rem; margin-bottom: 1rem; }
   .nav button {
     background: none; border: none; cursor: pointer;
-    font-size: 1.1rem; color: var(--ink-light); padding: 0.4rem 0.8rem;
+    font-size: 1.1rem; color: var(--ink-light); padding: 0.3rem 0.6rem;
     transition: color 0.2s; border-radius: 4px;
   }
   .nav button:hover { color: var(--ink); background: var(--paper-warm); }
-  .nav .month-label { font-size: 1.2rem; font-weight: 400; letter-spacing: 0.15em; min-width: 9rem; text-align: center; }
-  .today-btn {
-    background: none; border: 1px solid var(--ink-faint); border-radius: 4px;
-    cursor: pointer; font-family: inherit; font-size: 0.82rem;
-    color: var(--ink-light); padding: 0.2rem 0.6rem; letter-spacing: 0.05em;
-    transition: all 0.15s;
-  }
-  .today-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .nav .month-label { font-size: 1.1rem; font-weight: 400; letter-spacing: 0.15em; min-width: 8rem; text-align: center; }
   .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 0.6rem; }
   .weekdays span {
     text-align: center; font-size: 0.78rem; color: var(--ink-faint);
@@ -93,22 +85,11 @@
   .day.today .lunar { color: rgba(255,255,255,0.5); opacity: 1; }
   .day.today .jieqi { color: var(--gold); }
 
-  /* Legend */
   .calendar-wrap { width: 100%; max-width: 640px; }
-  .legend { display: flex; gap: 1.5rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
-  .legend-item { display: flex; align-items: center; gap: 0.45rem; font-size: 0.78rem; color: var(--ink-light); }
-  .legend-swatch { width: 22px; height: 14px; border-radius: 3px; }
+  .legend { display: flex; gap: 1.2rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--ink-light); }
+  .legend-swatch { width: 18px; height: 12px; border-radius: 3px; }
 
-  .divider { width: 60px; height: 1px; background: var(--ink-faint); margin: 1.5rem auto; opacity: 0.3; }
-
-  .info-panel {
-    max-width: 640px; width: 100%; margin-top: 1rem;
-    background: var(--paper-warm); border-left: 3px solid var(--gold);
-    padding: 1rem 1.5rem; border-radius: 0 6px 6px 0;
-    font-size: 0.88rem; color: var(--ink-light);
-    display: none;
-  }
-  .info-panel.active { display: block; }
   .upcoming-item {
     display: flex; align-items: baseline; gap: 1rem;
     padding: 0.7rem 0; border-bottom: 1px solid var(--paper-warm);
@@ -145,7 +126,6 @@
   <div class="legend-item"><div class="legend-swatch" style="background:var(--holiday-bg);border:1px solid #b8dfc4"></div>法定假日</div>
   <div class="legend-item"><div class="legend-swatch" style="background:var(--workday-bg);border:1px solid #f0c4be"></div>调休补班</div>
 </div>
-<div class="info-panel" id="infoPanel"></div>
 
 <div class="upcoming-wrap" style="max-width:640px;width:100%;margin-top:1.5rem">
   <div style="font-size:0.82rem;color:var(--ink-faint);letter-spacing:0.15em;margin-bottom:0.8rem">即将放假</div>
@@ -228,7 +208,6 @@ function goToday() {
   curYear = today.getFullYear();
   curMonth = today.getMonth();
   render();
-  document.getElementById('infoPanel').classList.remove('active');
   const todayEl = document.querySelector('.day.today');
   if (todayEl) todayEl.click();
 }
@@ -237,7 +216,6 @@ function jumpTo(year, month, day) {
   curYear = year;
   curMonth = month;
   render();
-  document.getElementById('infoPanel').classList.remove('active');
   // 找到对应日格子并点击
   const cells = document.querySelectorAll('.day:not(.empty)');
   for (const cell of cells) {
@@ -324,22 +302,9 @@ function render(){
     el.addEventListener('click',()=>{
       document.querySelectorAll('.day.selected').forEach(e=>e.classList.remove('selected'));
       el.classList.add('selected');
-      showInfo(date,k,holiday,workday,jieqi,lunar);
     });
     grid.appendChild(el);
   }
-}
-
-function showInfo(date,k,holiday,workday,jieqi,lunar){
-  const weeks=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
-  let html=`<div class="info-title">${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日　${weeks[date.getDay()]}</div>`;
-  html+=`<div class="info-row" style="color:var(--ink-faint)">农历 ${lunar}</div>`;
-  if(jieqi) html+=`<div class="info-row" style="color:var(--ink-light)">节气：${jieqi}</div>`;
-  if(holiday) html+=`<div class="info-row" style="color:var(--holiday-text)">法定假日：${holiday.name}</div>`;
-  if(workday) html+=`<div class="info-row" style="color:var(--workday-text)">调休补班：${workday}</div>`;
-  const panel = document.getElementById('infoPanel');
-  panel.innerHTML=html;
-  panel.classList.add('active');
 }
 
 function changeMonth(dir){
@@ -347,7 +312,6 @@ function changeMonth(dir){
   if(curMonth>11){curMonth=0;curYear++;}
   if(curMonth<0){curMonth=11;curYear--;}
   render();
-  document.getElementById('infoPanel').classList.remove('active');
 }
 
 render();
