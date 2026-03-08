@@ -1,0 +1,36 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="200" rx="38" fill="#faf8f4"/>
+  <rect width="200" height="200" rx="38" fill="none" stroke="#e8dfd0" stroke-width="1.5"/>
+
+  <!-- Wheat grains arranged like calendar cells, forming wheat-ear silhouette -->
+  <!-- Grain shape: rounded rect, 18x13, gap 5px between rows/cols -->
+  <!-- Cols centered at x=100: single→double→triple→triple→double -->
+
+  <!-- Row 1 · 1 grain -->
+  <rect x="91" y="34" width="18" height="13" rx="3.5" fill="#b8922a"/>
+
+  <!-- Row 2 · 2 grains -->
+  <rect x="79" y="53" width="18" height="13" rx="3.5" fill="#b8922a"/>
+  <rect x="103" y="53" width="18" height="13" rx="3.5" fill="#b8922a"/>
+
+  <!-- Row 3 · 3 grains -->
+  <rect x="67" y="72" width="18" height="13" rx="3.5" fill="#b8922a"/>
+  <rect x="91" y="72" width="18" height="13" rx="3.5" fill="#b8922a"/>
+  <rect x="115" y="72" width="18" height="13" rx="3.5" fill="#b8922a"/>
+
+  <!-- Row 4 · 3 grains (slightly warmer) -->
+  <rect x="67" y="91" width="18" height="13" rx="3.5" fill="#c9a040"/>
+  <rect x="91" y="91" width="18" height="13" rx="3.5" fill="#c9a040"/>
+  <rect x="115" y="91" width="18" height="13" rx="3.5" fill="#c9a040"/>
+
+  <!-- Row 5 · 2 grains (lightest, base of ear) -->
+  <rect x="79" y="110" width="18" height="13" rx="3.5" fill="#d4b060"/>
+  <rect x="103" y="110" width="18" height="13" rx="3.5" fill="#d4b060"/>
+
+  <!-- Stem -->
+  <line x1="100" y1="123" x2="100" y2="164" stroke="#2c2c2c" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Leaf on stem -->
+  <path d="M100,150 Q87,143 80,134" stroke="#2c2c2c" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>
