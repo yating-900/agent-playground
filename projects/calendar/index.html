@@ -103,7 +103,9 @@
   .upcoming-item {
     display: flex; align-items: baseline; gap: 1rem;
     padding: 0.7rem 0; border-bottom: 1px solid var(--paper-warm);
+    cursor: pointer; transition: opacity 0.15s;
   }
+  .upcoming-item:hover { opacity: 0.7; }
   .upcoming-item:last-child { border-bottom: none; }
   .upcoming-name { font-size: 0.95rem; color: var(--ink); min-width: 4rem; }
   .upcoming-date { font-size: 0.82rem; color: var(--ink-light); }
@@ -220,6 +222,22 @@ function getLunar(date){
   } catch(e){ return ''; }
 }
 
+function jumpTo(year, month, day) {
+  curYear = year;
+  curMonth = month;
+  render();
+  document.getElementById('infoPanel').innerHTML='<div style="color:var(--ink-faint)">点击日期查看详情</div>';
+  // 找到对应日格子并点击
+  const cells = document.querySelectorAll('.day:not(.empty)');
+  for (const cell of cells) {
+    if (parseInt(cell.querySelector('.num').textContent) === day) {
+      cell.click();
+      cell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      break;
+    }
+  }
+}
+
 function renderUpcoming(){
   const list = document.getElementById('upcomingList');
   // collect holiday groups: find first day of each holiday block after today
@@ -251,7 +269,7 @@ function renderUpcoming(){
   list.innerHTML = upcoming.map(u=>{
     const mo = u.date.getMonth()+1, da = u.date.getDate();
     const diffText = u.diff===0 ? '今天' : u.diff===1 ? '明天' : `${u.diff} 天后`;
-    return `<div class="upcoming-item">
+    return `<div class="upcoming-item" style="cursor:pointer" onclick="jumpTo(${u.date.getFullYear()},${u.date.getMonth()},${u.date.getDate()})">
       <span class="upcoming-name">${u.name}</span>
       <span class="upcoming-date">${u.date.getFullYear()}年${mo}月${da}日起 · ${u.count}天</span>
       <span class="upcoming-days">${diffText}</span>
