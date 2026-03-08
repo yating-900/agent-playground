@@ -71,15 +71,15 @@
 
   /* ─── Calendar card ─── */
   .cal-card {
-    background: var(--paper-card);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
   }
   .cal-nav {
     display: flex; align-items: center;
-    padding: 1.1rem 1.4rem 0.9rem;
-    border-bottom: 1px solid rgba(184,136,42,0.1);
+    padding: 0.8rem 0 0.7rem;
+    border-bottom: 1px solid rgba(184,136,42,0.15);
   }
   .cal-nav .month-label {
     font-size: 1.05rem; font-weight: 400; letter-spacing: 0.12em; color: var(--ink);
@@ -93,7 +93,7 @@
   }
   .nav-btn:hover { background: var(--paper); color: var(--ink); }
 
-  .cal-body { padding: 1rem 1rem 1.2rem; }
+  .cal-body { padding: 0.8rem 0 1rem; }
   .weekdays {
     display: grid; grid-template-columns: repeat(7, 1fr);
     margin-bottom: 0.5rem;
@@ -155,8 +155,8 @@
 
   /* Legend */
   .cal-legend {
-    display: flex; gap: 1rem; padding: 0.7rem 1.4rem;
-    border-top: 1px solid rgba(184,136,42,0.08);
+    display: flex; gap: 1rem; padding: 0.7rem 0;
+    border-top: 1px solid rgba(184,136,42,0.1);
     flex-wrap: wrap;
   }
   .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; color: var(--ink-soft); }
