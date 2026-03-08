@@ -39,7 +39,13 @@
   }
   .nav button:hover { color: var(--ink); background: var(--paper-warm); }
   .nav .month-label { font-size: 1.2rem; font-weight: 400; letter-spacing: 0.15em; min-width: 9rem; text-align: center; }
-  .calendar-wrap { width: 100%; max-width: 640px; }
+  .today-btn {
+    background: none; border: 1px solid var(--ink-faint); border-radius: 4px;
+    cursor: pointer; font-family: inherit; font-size: 0.82rem;
+    color: var(--ink-light); padding: 0.2rem 0.6rem; letter-spacing: 0.05em;
+    transition: all 0.15s;
+  }
+  .today-btn:hover { border-color: var(--ink); color: var(--ink); }
   .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 0.6rem; }
   .weekdays span {
     text-align: center; font-size: 0.78rem; color: var(--ink-faint);
@@ -124,6 +130,7 @@
   <button onclick="changeMonth(-1)">◁</button>
   <div class="month-label" id="monthLabel"></div>
   <button onclick="changeMonth(1)">▷</button>
+  <button class="today-btn" onclick="goToday()">今</button>
 </div>
 
 <div class="calendar-wrap">
@@ -219,6 +226,15 @@ function getLunar(date){
     const dayCN = (!isNaN(dayNum) && dayNum>=1 && dayNum<=30) ? LUNAR_DAYS[dayNum-1] : dayRaw;
     return dayCN==='初一' ? (month+'月') : dayCN;
   } catch(e){ return ''; }
+}
+
+function goToday() {
+  curYear = today.getFullYear();
+  curMonth = today.getMonth();
+  render();
+  document.getElementById('infoPanel').innerHTML='<div style="color:var(--ink-faint)">点击日期查看详情</div>';
+  const todayEl = document.querySelector('.day.today');
+  if (todayEl) todayEl.click();
 }
 
 function jumpTo(year, month, day) {
