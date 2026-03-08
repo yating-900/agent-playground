@@ -68,7 +68,8 @@
   /* Normal */
   .day.normal .num { color: var(--ink); }
 
-  .day.selected { box-shadow: 0 0 0 2px var(--gold); }
+  .day.selected { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .day.today.selected { outline: 2px solid var(--gold); outline-offset: 1px; }
 
   /* Holiday — green fill */
   .day.holiday { background: var(--holiday-bg); }
