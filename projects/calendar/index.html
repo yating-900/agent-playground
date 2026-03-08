@@ -5,280 +5,165 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>麦序日历</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --ink: #1e1c1a;
-    --ink-mid: #4a4540;
-    --ink-soft: #8a8078;
-    --ink-faint: #c0b8b0;
-    --paper: #faf8f4;
-    --paper-card: #ffffff;
-    --gold: #b8882a;
-    --gold-light: #e8c870;
-    --gold-bg: #fdf6e3;
-    --green: #2e7d52;
-    --green-bg: #eaf4ee;
-    --red: #a83020;
-    --red-bg: #fdecea;
-    --blue: #3d6880;
-    --shadow: 0 2px 16px rgba(30,28,26,0.08), 0 0 0 1px rgba(184,136,42,0.1);
+    --ink: #2c2c2c; --ink-light: #5a5a5a; --ink-faint: #9a9080;
+    --paper: #faf8f4; --paper-warm: #f0ebe0;
+    --holiday-bg: #e8f4ec; --holiday-text: #2e7d4f;
+    --workday-bg: #fde8e6; --workday-text: #b03020;
+    --gold: #b8922a; --gold-bg: #fdf3d8;
+    --weekend: #6b8fa0;
+    --today-bg: #2c2c2c;
   }
-  html { font-size: 16px; }
   body {
     font-family: 'Noto Serif SC', 'STSong', serif;
-    background: var(--paper);
-    background-image:
-      radial-gradient(ellipse at 15% 10%, rgba(184,136,42,0.06) 0%, transparent 55%),
-      radial-gradient(ellipse at 85% 90%, rgba(184,136,42,0.04) 0%, transparent 45%);
-    color: var(--ink);
-    min-height: 100vh;
-  }
-
-  /* ─── Header ─── */
-  .site-header {
-    background: var(--ink);
-    padding: 2rem 2.5rem 1.8rem;
-    display: flex; align-items: center; gap: 1.2rem;
-  }
-  .logo-svg { width: 44px; height: 44px; flex-shrink: 0; }
-  .header-text h1 {
-    font-size: 1.6rem; font-weight: 300; letter-spacing: 0.5em;
-    color: #faf8f4; line-height: 1;
-  }
-  .header-text .tagline {
-    font-size: 0.72rem; color: var(--gold-light);
-    letter-spacing: 0.2em; margin-top: 0.35rem;
+    background: var(--paper); color: var(--ink);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; padding: 1.5rem 1rem 3rem;
+    background-image: radial-gradient(circle at 20% 20%, rgba(185,146,42,0.04) 0%, transparent 60%),
+                      radial-gradient(circle at 80% 80%, rgba(185,146,42,0.03) 0%, transparent 50%);
   }
   .back-link {
-    margin-left: auto; font-size: 0.78rem; color: rgba(245,240,232,0.4);
-    text-decoration: none; letter-spacing: 0.08em; transition: color 0.2s;
+    position: fixed; top: 0.8rem; left: 1rem;
+    font-size: 0.85rem; color: var(--ink-faint);
+    text-decoration: none; letter-spacing: 0.05em; z-index: 100;
   }
-  .back-link:hover { color: rgba(245,240,232,0.8); }
-
-  /* ─── Layout ─── */
-  .layout {
-    display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 1.5rem;
-    max-width: 960px;
-    margin: 1.5rem auto;
-    padding: 0 1.5rem 3rem;
-  }
-  @media (max-width: 700px) {
-    .layout { grid-template-columns: 1fr; padding: 0 1rem 3rem; }
-  }
-
-  /* ─── Calendar card ─── */
-  .cal-card {
-    background: transparent;
-    border-radius: 0;
-    box-shadow: none;
-    overflow: visible;
-  }
-  .cal-nav {
-    display: flex; align-items: center;
-    padding: 0.8rem 0 0.7rem;
-    border-bottom: 1px solid rgba(184,136,42,0.15);
-  }
-  .cal-nav .month-label {
-    font-size: 1.05rem; font-weight: 400; letter-spacing: 0.12em; color: var(--ink);
-    flex: 1; text-align: center;
-  }
-  .nav-btn {
+  .back-link:hover { color: var(--ink); }
+  header { text-align: center; margin-bottom: 1.2rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+  header svg { width: 52px; height: 52px; }
+  header h1 { font-size: 1.6rem; font-weight: 300; letter-spacing: 0.45em; }
+  .header-rule { width: 40px; height: 1.5px; background: var(--gold); opacity: 0.5; border-radius: 1px; }
+  .nav { display: flex; align-items: center; gap: 2rem; margin-bottom: 1rem; }
+  .nav button {
     background: none; border: none; cursor: pointer;
-    color: var(--ink-soft); font-size: 1rem; padding: 0.3rem 0.7rem;
-    border-radius: 6px; transition: background 0.15s, color 0.15s;
-    line-height: 1;
+    font-size: 1.1rem; color: var(--ink-light); padding: 0.3rem 0.6rem;
+    transition: color 0.2s; border-radius: 4px;
   }
-  .nav-btn:hover { background: var(--paper); color: var(--ink); }
-
-  .cal-body { padding: 0.8rem 0 1rem; }
-  .weekdays {
-    display: grid; grid-template-columns: repeat(7, 1fr);
-    margin-bottom: 0.5rem;
-  }
+  .nav button:hover { color: var(--ink); background: var(--paper-warm); }
+  .nav .month-label { font-size: 1.1rem; font-weight: 400; letter-spacing: 0.15em; min-width: 8rem; text-align: center; }
+  .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 0.6rem; }
   .weekdays span {
-    text-align: center; font-size: 0.7rem; color: var(--ink-faint);
-    padding: 0.3rem 0; letter-spacing: 0.05em;
+    text-align: center; font-size: 0.78rem; color: var(--ink-faint);
+    letter-spacing: 0.05em; padding: 0.4rem 0; font-weight: 400;
   }
-  .weekdays .wd-sat { color: var(--blue); opacity: 0.7; }
-  .weekdays .wd-sun { color: var(--red); opacity: 0.7; }
+  .weekdays span:first-child { color: #b03020; }
+  .weekdays span:last-child { color: var(--weekend); }
+  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
 
-  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-
+  /* Base day cell */
   .day {
     aspect-ratio: 1;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    border-radius: 8px; cursor: pointer;
-    transition: transform 0.12s, box-shadow 0.12s;
-    padding: 3px 2px; gap: 2px;
-    position: relative;
+    border-radius: 6px; cursor: pointer;
+    transition: opacity 0.15s, box-shadow 0.15s;
+    padding: 4px 2px; gap: 2px;
   }
-  .day.empty { pointer-events: none; cursor: default; }
-  .day:not(.empty):hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(30,28,26,0.1); }
-  .day:not(.empty):active { transform: scale(0.96); }
+  .day.empty { pointer-events: none; }
+  .day:not(.empty):hover { opacity: 0.85; box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
 
-  .day .num { font-size: 1.05rem; font-weight: 500; line-height: 1; }
-  .day .sub  { font-size: 0.6rem; line-height: 1; opacity: 0.65; }
-  .day .jieqi { font-size: 0.6rem; line-height: 1; font-weight: 600; opacity: 0.8; }
+  .day .num { font-size: 1.15rem; font-weight: 500; line-height: 1; }
+  .day .lunar { font-size: 0.68rem; line-height: 1; color: inherit; opacity: 0.7; }
+  .day .jieqi { font-size: 0.68rem; line-height: 1; color: inherit; opacity: 0.7; font-weight: 600; }
 
-  /* Normal */
-  .day.normal { background: rgba(255,255,255,0.7); }
-  .day.normal .num { color: var(--ink); }
-  .day.normal.wd-sat .num { color: var(--blue); }
-  .day.normal.wd-sun .num { color: var(--red); opacity: 0.8; }
+  /* Weekend column tint */
+  .day.weekend-sat .num { color: var(--weekend); }
+  .day.weekend-sun .num { color: #b03020; }
+  .day.normal.weekend-sat, .day.normal.weekend-sun { background: rgba(107,143,160,0.04); }
 
-  /* Weekend (no special override) */
-  .day.weekend { background: rgba(255,255,255,0.5); }
-  .day.weekend .num { color: var(--ink-mid); opacity: 0.7; }
-  .day.weekend.wd-sat .num { color: var(--blue); opacity: 0.8; }
-  .day.weekend.wd-sun .num { color: var(--red); opacity: 0.7; }
-
-  /* Holiday */
-  .day.holiday { background: var(--green-bg); }
-  .day.holiday .num { color: var(--green); font-weight: 600; }
-  .day.holiday .sub { color: var(--green); }
-
-  /* Workday */
-  .day.workday { background: var(--red-bg); }
-  .day.workday .num { color: var(--red); font-weight: 600; }
-  .day.workday .sub { color: var(--red); }
-
-  /* Today */
-  .day.today { background: var(--ink); }
-  .day.today .num { color: #faf8f4; font-weight: 400; }
-  .day.today .sub { color: rgba(245,240,232,0.45); opacity: 1; }
-  .day.today .jieqi { color: var(--gold-light); opacity: 1; }
-
-  /* Selected */
   .day.selected { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .day.today.selected { outline: 2px solid var(--gold); outline-offset: 1px; }
 
-  /* Legend */
-  .cal-legend {
-    display: flex; gap: 1rem; padding: 0.7rem 0;
-    border-top: 1px solid rgba(184,136,42,0.1);
-    flex-wrap: wrap;
-  }
-  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; color: var(--ink-soft); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+  /* Holiday — green fill */
+  .day.holiday { background: var(--holiday-bg); }
+  .day.holiday .num { color: var(--holiday-text); font-weight: 600; }
+  .day.holiday .lunar { color: var(--holiday-text); }
 
-  /* ─── Side panel ─── */
-  .side { display: flex; flex-direction: column; gap: 1.2rem; }
+  /* Workday (调休补班) — red fill */
+  .day.workday { background: var(--workday-bg); }
+  .day.workday .num { color: var(--workday-text); font-weight: 600; }
+  .day.workday .lunar { color: var(--workday-text); }
 
-  .upcoming-card {
-    background: var(--paper-card);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
+  /* Today — dark fill */
+  .day.today { background: var(--today-bg) !important; }
+  .day.today .num { color: #faf8f4; font-weight: 400; }
+  .day.today .lunar { color: rgba(255,255,255,0.5); opacity: 1; }
+  .day.today .jieqi { color: var(--gold); }
+
+  .calendar-wrap {
+    width: 100%; max-width: 640px;
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 2px 24px rgba(44,44,44,0.07), 0 0 0 1px rgba(185,146,42,0.08);
+    padding: 1.2rem 1.2rem 1rem;
   }
-  .upcoming-head {
-    padding: 0.9rem 1.3rem 0.7rem;
-    border-bottom: 1px solid rgba(184,136,42,0.1);
-    font-size: 0.7rem; color: var(--ink-soft); letter-spacing: 0.2em;
+  .legend { display: flex; gap: 1.2rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--ink-light); }
+  .legend-swatch { width: 18px; height: 12px; border-radius: 3px; }
+
+  .upcoming-wrap {
+    max-width: 640px; width: 100%; margin-top: 1.2rem;
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 2px 24px rgba(44,44,44,0.07), 0 0 0 1px rgba(185,146,42,0.08);
+    padding: 1.2rem 1.5rem;
   }
-  .upcoming-list { padding: 0.4rem 0; }
+  .upcoming-label { font-size: 0.72rem; color: var(--ink-faint); letter-spacing: 0.2em; margin-bottom: 0.8rem; }
   .upcoming-item {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 0.6rem 0.8rem;
-    padding: 0.75rem 1.3rem;
-    cursor: pointer;
-    transition: background 0.15s;
-    border-bottom: 1px solid rgba(184,136,42,0.06);
+    display: flex; align-items: baseline; gap: 1rem;
+    padding: 0.7rem 0; border-bottom: 1px solid var(--paper-warm);
+    cursor: pointer; transition: opacity 0.15s;
   }
+  .upcoming-item:hover { opacity: 0.7; }
   .upcoming-item:last-child { border-bottom: none; }
-  .upcoming-item:hover { background: var(--gold-bg); }
-  .upcoming-icon {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: var(--green-bg);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.7rem; color: var(--green); font-weight: 600;
-    letter-spacing: 0; text-align: center; line-height: 1.2;
-    flex-shrink: 0;
-  }
-  .upcoming-info { min-width: 0; }
-  .upcoming-name { font-size: 0.88rem; color: var(--ink); font-weight: 500; }
-  .upcoming-date { font-size: 0.7rem; color: var(--ink-soft); margin-top: 0.15rem; }
-  .upcoming-badge {
-    font-size: 0.7rem; color: var(--green); background: var(--green-bg);
-    padding: 3px 8px; border-radius: 10px; white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  /* Jieqi tip card */
-  .jieqi-card {
-    background: linear-gradient(135deg, var(--ink) 0%, #3a3530 100%);
-    border-radius: 16px;
-    padding: 1.2rem 1.3rem;
-    box-shadow: var(--shadow);
-  }
-  .jieqi-card .label { font-size: 0.68rem; color: var(--gold-light); letter-spacing: 0.15em; margin-bottom: 0.5rem; }
-  .jieqi-card .name { font-size: 1.4rem; font-weight: 300; color: #faf8f4; letter-spacing: 0.2em; }
-  .jieqi-card .date { font-size: 0.72rem; color: rgba(245,240,232,0.45); margin-top: 0.3rem; }
+  .upcoming-name { font-size: 0.95rem; color: var(--ink); min-width: 4rem; }
+  .upcoming-date { font-size: 0.82rem; color: var(--ink-light); }
+  .upcoming-days { margin-left: auto; font-size: 0.82rem; color: var(--holiday-text); background: var(--holiday-bg); padding: 2px 8px; border-radius: 10px; }
 </style>
 </head>
 <body>
+<a class="back-link" href="../../index.html">← 主页</a>
 
-<header class="site-header">
-  <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<header>
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <rect x="91" y="34" width="18" height="13" rx="3.5" fill="#b8922a"/>
     <rect x="79" y="53" width="18" height="13" rx="3.5" fill="#b8922a"/>
     <rect x="103" y="53" width="18" height="13" rx="3.5" fill="#b8922a"/>
-    <rect x="67" y="72" width="18" height="13" rx="3.5" fill="#c9a040"/>
-    <rect x="91" y="72" width="18" height="13" rx="3.5" fill="#c9a040"/>
-    <rect x="115" y="72" width="18" height="13" rx="3.5" fill="#c9a040"/>
-    <rect x="67" y="91" width="18" height="13" rx="3.5" fill="#d4b060"/>
-    <rect x="91" y="91" width="18" height="13" rx="3.5" fill="#d4b060"/>
-    <rect x="115" y="91" width="18" height="13" rx="3.5" fill="#d4b060"/>
-    <rect x="79" y="110" width="18" height="13" rx="3.5" fill="#dfc070"/>
-    <rect x="103" y="110" width="18" height="13" rx="3.5" fill="#dfc070"/>
-    <line x1="100" y1="123" x2="100" y2="164" stroke="#faf8f4" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M100,150 Q87,143 80,134" stroke="#faf8f4" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <rect x="67" y="72" width="18" height="13" rx="3.5" fill="#b8922a"/>
+    <rect x="91" y="72" width="18" height="13" rx="3.5" fill="#b8922a"/>
+    <rect x="115" y="72" width="18" height="13" rx="3.5" fill="#b8922a"/>
+    <rect x="67" y="91" width="18" height="13" rx="3.5" fill="#c9a040"/>
+    <rect x="91" y="91" width="18" height="13" rx="3.5" fill="#c9a040"/>
+    <rect x="115" y="91" width="18" height="13" rx="3.5" fill="#c9a040"/>
+    <rect x="79" y="110" width="18" height="13" rx="3.5" fill="#d4b060"/>
+    <rect x="103" y="110" width="18" height="13" rx="3.5" fill="#d4b060"/>
+    <line x1="100" y1="123" x2="100" y2="164" stroke="#2c2c2c" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M100,150 Q87,143 80,134" stroke="#2c2c2c" stroke-width="2" fill="none" stroke-linecap="round"/>
   </svg>
-  <div class="header-text">
-    <h1>麦序日历</h1>
-    <div class="tagline">离下一个假期，还有几天</div>
-  </div>
-  <a class="back-link" href="../../index.html">← 主页</a>
+  <h1>麦序日历</h1>
+  <div class="header-rule"></div>
 </header>
 
-<div class="layout">
-  <!-- Calendar -->
-  <div class="cal-card">
-    <div class="cal-nav">
-      <button class="nav-btn" onclick="changeMonth(-1)">◁</button>
-      <div class="month-label" id="monthLabel"></div>
-      <button class="nav-btn" onclick="changeMonth(1)">▷</button>
-    </div>
-    <div class="cal-body">
-      <div class="weekdays">
-        <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span>
-        <span class="wd-sat">六</span><span class="wd-sun">日</span>
-      </div>
-      <div class="days" id="daysGrid"></div>
-    </div>
-    <div class="cal-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--green-bg);border:1px solid #a8d8b8"></div>法定假日</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--red-bg);border:1px solid #f0b8b0"></div>调休补班</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--ink)"></div>今日</div>
-    </div>
-  </div>
+<div class="nav">
+  <button onclick="changeMonth(-1)">◁</button>
+  <div class="month-label" id="monthLabel"></div>
+  <button onclick="changeMonth(1)">▷</button>
+</div>
 
-  <!-- Sidebar -->
-  <div class="side">
-    <div class="upcoming-card">
-      <div class="upcoming-head">即将放假</div>
-      <div class="upcoming-list" id="upcomingList"></div>
-    </div>
-    <div class="jieqi-card" id="jieqiCard" style="display:none">
-      <div class="label">下一个节气</div>
-      <div class="name" id="jieqiName"></div>
-      <div class="date" id="jieqiDate"></div>
-    </div>
+<div class="calendar-wrap">
+  <div class="weekdays">
+    <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span style="color:#b03020">日</span>
   </div>
+  <div class="days" id="daysGrid"></div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--holiday-bg);border:1px solid #b8dfc4"></div>法定假日</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--workday-bg);border:1px solid #f0c4be"></div>调休补班</div>
+</div>
+
+<div class="upcoming-wrap">
+  <div class="upcoming-label">即将放假</div>
+  <div id="upcomingList"></div>
 </div>
 
 <script>
@@ -333,98 +218,97 @@ let curYear = today.getFullYear(), curMonth = today.getMonth();
 function pad(n){ return String(n).padStart(2,'0'); }
 function key(y,m,d){ return `${y}-${pad(m+1)}-${pad(d)}`; }
 
-const LUNAR_DAYS=['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十',
+const LUNAR_DAYS = ['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十',
   '十一','十二','十三','十四','十五','十六','十七','十八','十九','二十',
   '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
 
 function getLunar(date){
   try {
-    const fmt=new Intl.DateTimeFormat('zh-CN-u-ca-chinese',{month:'long',day:'numeric'});
-    const parts=fmt.formatToParts(date);
+    const fmt = new Intl.DateTimeFormat('zh-CN-u-ca-chinese',{month:'long',day:'numeric'});
+    const parts = fmt.formatToParts(date);
     let month='', dayRaw='';
     for(const p of parts){
       if(p.type==='month') month=p.value;
       if(p.type==='day') dayRaw=p.value;
     }
-    const dayNum=parseInt(dayRaw);
-    const dayCN=(!isNaN(dayNum)&&dayNum>=1&&dayNum<=30)?LUNAR_DAYS[dayNum-1]:dayRaw;
-    return dayCN==='初一'?(month+'月'):dayCN;
+    // dayRaw 可能是"初二"也可能是"2"，统一转为中文
+    const dayNum = parseInt(dayRaw);
+    const dayCN = (!isNaN(dayNum) && dayNum>=1 && dayNum<=30) ? LUNAR_DAYS[dayNum-1] : dayRaw;
+    return dayCN==='初一' ? (month+'月') : dayCN;
   } catch(e){ return ''; }
 }
 
+function goToday() {
+  curYear = today.getFullYear();
+  curMonth = today.getMonth();
+  render();
+  const todayEl = document.querySelector('.day.today');
+  if (todayEl) todayEl.click();
+}
+
 function jumpTo(year, month, day) {
-  curYear=year; curMonth=month; render();
-  const cells=document.querySelectorAll('.day:not(.empty)');
-  for(const cell of cells){
-    if(parseInt(cell.querySelector('.num').textContent)===day){
+  curYear = year;
+  curMonth = month;
+  render();
+  // 找到对应日格子并点击
+  const cells = document.querySelectorAll('.day:not(.empty)');
+  for (const cell of cells) {
+    if (parseInt(cell.querySelector('.num').textContent) === day) {
       cell.click();
-      cell.scrollIntoView({behavior:'smooth',block:'center'});
+      cell.scrollIntoView({ behavior: 'smooth', block: 'center' });
       break;
     }
   }
 }
 
-function renderNextJieqi(){
-  const todayTs = today.getTime();
-  const entries = Object.entries(JIEQI)
-    .map(([k,v])=>({date:new Date(k),name:v,key:k}))
-    .filter(e=>e.date>=today)
-    .sort((a,b)=>a.date-b.date);
-  if(!entries.length) return;
-  const next=entries[0];
-  const diff=Math.round((next.date-today)/(1000*60*60*24));
-  document.getElementById('jieqiCard').style.display='';
-  document.getElementById('jieqiName').textContent=next.name;
-  document.getElementById('jieqiDate').textContent=
-    `${next.date.getMonth()+1}月${next.date.getDate()}日 · ${diff===0?'今天':diff+'天后'}`;
-}
-
 function renderUpcoming(){
-  const list=document.getElementById('upcomingList');
-  const seen=new Set(), upcoming=[];
-  for(let i=0;i<400;i++){
-    const d=new Date(today); d.setDate(today.getDate()+i);
-    const k=key(d.getFullYear(),d.getMonth(),d.getDate());
+  const list = document.getElementById('upcomingList');
+  // collect holiday groups: find first day of each holiday block after today
+  const todayKey = key(today.getFullYear(), today.getMonth(), today.getDate());
+  const seen = new Set();
+  const upcoming = [];
+  // scan next 400 days
+  for(let i=0; i<400; i++){
+    const d = new Date(today); d.setDate(today.getDate()+i);
+    const k = key(d.getFullYear(), d.getMonth(), d.getDate());
     if(HOLIDAYS[k]){
-      const name=HOLIDAYS[k].name;
+      const name = HOLIDAYS[k].name;
       if(!seen.has(name)){
         seen.add(name);
+        // count consecutive days
         let count=0, dd=new Date(d);
         while(true){
           const kk=key(dd.getFullYear(),dd.getMonth(),dd.getDate());
-          if(HOLIDAYS[kk]&&HOLIDAYS[kk].name===name){count++;dd.setDate(dd.getDate()+1);}
+          if(HOLIDAYS[kk]&&HOLIDAYS[kk].name===name){ count++; dd.setDate(dd.getDate()+1); }
           else break;
         }
-        const diff=Math.round((d-today)/(1000*60*60*24));
-        upcoming.push({name,date:d,count,diff});
+        const diff = Math.round((d-today)/(1000*60*60*24));
+        upcoming.push({name, date:d, count, diff});
         if(upcoming.length>=5) break;
       }
     }
   }
-  if(!upcoming.length){ list.innerHTML='<div style="padding:1rem 1.3rem;color:var(--ink-soft);font-size:0.82rem">暂无数据</div>'; return; }
-  list.innerHTML=upcoming.map(u=>{
-    const mo=u.date.getMonth()+1, da=u.date.getDate();
-    const diffText=u.diff===0?'今天':u.diff===1?'明天':`${u.diff}天后`;
-    // icon: first char of name
-    const icon=u.name.slice(0,2);
-    return `<div class="upcoming-item" onclick="jumpTo(${u.date.getFullYear()},${u.date.getMonth()},${da})">
-      <div class="upcoming-icon">${icon}</div>
-      <div class="upcoming-info">
-        <div class="upcoming-name">${u.name}</div>
-        <div class="upcoming-date">${mo}月${da}日起 · ${u.count}天</div>
-      </div>
-      <div class="upcoming-badge">${diffText}</div>
+  if(!upcoming.length){ list.innerHTML='<div style="color:var(--ink-faint);font-size:0.85rem">暂无数据</div>'; return; }
+  list.innerHTML = upcoming.map(u=>{
+    const mo = u.date.getMonth()+1, da = u.date.getDate();
+    const diffText = u.diff===0 ? '今天' : u.diff===1 ? '明天' : `${u.diff} 天后`;
+    return `<div class="upcoming-item" style="cursor:pointer" onclick="jumpTo(${u.date.getFullYear()},${u.date.getMonth()},${u.date.getDate()})">
+      <span class="upcoming-name">${u.name}</span>
+      <span class="upcoming-date">${u.date.getFullYear()}年${mo}月${da}日起 · ${u.count}天</span>
+      <span class="upcoming-days">${diffText}</span>
     </div>`;
   }).join('');
 }
 
 function render(){
-  document.getElementById('monthLabel').textContent=`${curYear} 年 ${curMonth+1} 月`;
-  const grid=document.getElementById('daysGrid');
-  grid.innerHTML='';
-  const firstDowRaw=new Date(curYear,curMonth,1).getDay();
-  const firstDay=(firstDowRaw+6)%7;
-  const daysInMonth=new Date(curYear,curMonth+1,0).getDate();
+  document.getElementById('monthLabel').textContent = `${curYear} 年 ${curMonth+1} 月`;
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = '';
+  // 周一为首列：原 getDay() 0=Sun→6, 1=Mon→0 ... 6=Sat→5
+  const firstDowRaw = new Date(curYear, curMonth, 1).getDay();
+  const firstDay = (firstDowRaw + 6) % 7; // shift so Mon=0
+  const daysInMonth = new Date(curYear, curMonth+1, 0).getDate();
+
   for(let i=0;i<firstDay;i++){
     const el=document.createElement('div'); el.className='day empty'; grid.appendChild(el);
   }
@@ -434,8 +318,9 @@ function render(){
     const dow=date.getDay();
     const isToday=(curYear===today.getFullYear()&&curMonth===today.getMonth()&&d===today.getDate());
     const holiday=HOLIDAYS[k], workday=WORKDAYS[k], jieqi=JIEQI[k];
-    const isWeekend=(dow===0||dow===6)&&!workday&&!holiday;
+    const isWeekend=(dow===0||dow===6)&&!workday&&!holiday; // Sun=0, Sat=6
     const lunar=getLunar(date);
+
     const el=document.createElement('div');
     let cls='day';
     if(isToday) cls+=' today';
@@ -443,11 +328,13 @@ function render(){
     else if(workday) cls+=' workday';
     else if(isWeekend) cls+=' weekend';
     else cls+=' normal';
-    if(dow===6) cls+=' wd-sat';
-    if(dow===0) cls+=' wd-sun';
+    if(dow===6) cls+=' weekend-sat';
+    if(dow===0) cls+=' weekend-sun';
     el.className=cls;
-    const subLine=jieqi?`<span class="jieqi">${jieqi}</span>`:`<span class="sub">${lunar}</span>`;
-    el.innerHTML=`<span class="num">${d}</span>${subLine}`;
+
+    const subLine = jieqi ? '<span class="jieqi">'+jieqi+'</span>' : lunar;
+    el.innerHTML='<span class="num">'+d+'</span><span class="lunar">'+subLine+'</span>';
+
     el.addEventListener('click',()=>{
       document.querySelectorAll('.day.selected').forEach(e=>e.classList.remove('selected'));
       el.classList.add('selected');
@@ -465,8 +352,8 @@ function changeMonth(dir){
 
 render();
 renderUpcoming();
-renderNextJieqi();
-const todayEl=document.querySelector('.day.today');
+// auto select today
+const todayEl = document.querySelector('.day.today');
 if(todayEl) todayEl.click();
 </script>
 </body>
