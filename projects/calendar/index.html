@@ -8,10 +8,13 @@
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --ink: #2c2c2c; --ink-light: #6b6b6b; --ink-faint: #b0a898;
-    --paper: #faf8f4; --paper-warm: #f3efe8;
-    --red: #c0392b; --red-soft: #e8c4be;
-    --gold: #c9a84c; --green: #4a7c59; --accent: #7b9e87;
+    --ink: #2c2c2c; --ink-light: #5a5a5a; --ink-faint: #9a9080;
+    --paper: #faf8f4; --paper-warm: #f0ebe0;
+    --holiday-bg: #e8f4ec; --holiday-text: #2e7d4f;
+    --workday-bg: #fde8e6; --workday-text: #b03020;
+    --gold: #b8922a; --gold-bg: #fdf3d8;
+    --weekend: #6b8fa0;
+    --today-bg: #2c2c2c;
   }
   body {
     font-family: 'Noto Serif SC', 'STSong', serif;
@@ -19,59 +22,91 @@
     min-height: 100vh; display: flex; flex-direction: column;
     align-items: center; padding: 2rem 1rem 4rem;
   }
+  .back-link {
+    position: fixed; top: 1rem; left: 1rem;
+    font-size: 0.85rem; color: var(--ink-faint);
+    text-decoration: none; letter-spacing: 0.05em; z-index: 100;
+  }
+  .back-link:hover { color: var(--ink); }
   header { text-align: center; margin-bottom: 2.5rem; }
-  header h1 { font-size: 2rem; font-weight: 300; letter-spacing: 0.3em; margin-bottom: 0.3rem; }
-  header .subtitle { font-size: 0.8rem; color: var(--ink-faint); letter-spacing: 0.2em; }
-  .nav { display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; }
+  header h1 { font-size: 2rem; font-weight: 300; letter-spacing: 0.4em; margin-bottom: 0.4rem; }
+  header .subtitle { font-size: 0.82rem; color: var(--ink-faint); letter-spacing: 0.2em; }
+  .nav { display: flex; align-items: center; gap: 2.5rem; margin-bottom: 2rem; }
   .nav button {
     background: none; border: none; cursor: pointer;
-    font-size: 1.2rem; color: var(--ink-light); padding: 0.3rem 0.6rem; transition: color 0.2s;
+    font-size: 1.1rem; color: var(--ink-light); padding: 0.4rem 0.8rem;
+    transition: color 0.2s; border-radius: 4px;
   }
-  .nav button:hover { color: var(--ink); }
-  .nav .month-label { font-size: 1.3rem; font-weight: 300; letter-spacing: 0.2em; min-width: 9rem; text-align: center; }
-  .calendar-wrap { width: 100%; max-width: 680px; }
-  .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 0.5rem; }
-  .weekdays span { text-align: center; font-size: 0.75rem; color: var(--ink-faint); letter-spacing: 0.1em; padding: 0.4rem 0; }
-  .weekdays span:first-child { color: var(--red); }
-  .weekdays span:last-child { color: var(--accent); }
-  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .nav button:hover { color: var(--ink); background: var(--paper-warm); }
+  .nav .month-label { font-size: 1.2rem; font-weight: 400; letter-spacing: 0.15em; min-width: 9rem; text-align: center; }
+  .calendar-wrap { width: 100%; max-width: 640px; }
+  .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 0.6rem; }
+  .weekdays span {
+    text-align: center; font-size: 0.78rem; color: var(--ink-faint);
+    letter-spacing: 0.05em; padding: 0.4rem 0; font-weight: 400;
+  }
+  .weekdays span:first-child { color: #b03020; }
+  .weekdays span:last-child { color: var(--weekend); }
+  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+
+  /* Base day cell */
   .day {
-    aspect-ratio: 1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; border-radius: 4px;
-    cursor: default; position: relative; transition: background 0.15s; padding: 2px;
+    aspect-ratio: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border-radius: 6px; cursor: pointer;
+    transition: opacity 0.15s, box-shadow 0.15s;
+    padding: 4px 2px; gap: 2px;
   }
-  .day:not(.empty):hover { background: var(--paper-warm); cursor: pointer; }
   .day.empty { pointer-events: none; }
-  .day .num { font-size: 1rem; font-weight: 300; line-height: 1; }
-  .day .lunar { font-size: 0.55rem; color: var(--ink-faint); margin-top: 2px; }
-  .day.today { background: var(--ink); }
-  .day.today .num { color: var(--paper); }
-  .day.today .lunar { color: rgba(255,255,255,0.4); }
-  .day.holiday .num { color: var(--red); }
-  .day .tag {
-    font-size: 0.48rem; border-radius: 2px; padding: 1px 3px; margin-top: 1px;
-    white-space: nowrap; max-width: 90%; overflow: hidden; text-overflow: ellipsis;
-  }
-  .day.holiday .tag { color: var(--red); background: var(--red-soft); }
-  .day.workday .num { color: var(--green); }
-  .day.workday .tag { color: var(--green); background: #d4e8d8; }
-  .day .jieqi { font-size: 0.5rem; color: var(--gold); margin-top: 1px; }
-  .day.weekend:not(.today) .num { color: var(--accent); }
+  .day:not(.empty):hover { opacity: 0.85; box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
+
+  .day .num { font-size: 1.05rem; font-weight: 400; line-height: 1; }
+  .day .lunar { font-size: 0.62rem; line-height: 1; color: inherit; opacity: 0.65; }
+  .day .jieqi { font-size: 0.58rem; line-height: 1; color: var(--gold); font-weight: 400; }
+
+  /* Normal */
+  .day.normal .num { color: var(--ink); }
+
+  /* Weekend */
+  .day.weekend .num { color: var(--weekend); }
+
+  /* Holiday — green fill */
+  .day.holiday { background: var(--holiday-bg); }
+  .day.holiday .num { color: var(--holiday-text); font-weight: 600; }
+  .day.holiday .lunar { color: var(--holiday-text); }
+
+  /* Workday (调休补班) — red fill */
+  .day.workday { background: var(--workday-bg); }
+  .day.workday .num { color: var(--workday-text); font-weight: 600; }
+  .day.workday .lunar { color: var(--workday-text); }
+
+  /* Today — dark fill */
+  .day.today { background: var(--today-bg) !important; }
+  .day.today .num { color: #faf8f4; font-weight: 400; }
+  .day.today .lunar { color: rgba(255,255,255,0.5); opacity: 1; }
+  .day.today .jieqi { color: var(--gold); }
+
+  /* Legend */
   .legend { display: flex; gap: 1.5rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
-  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--ink-light); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-  .divider { width: 60px; height: 1px; background: var(--ink-faint); margin: 1.5rem auto; opacity: 0.4; }
+  .legend-item { display: flex; align-items: center; gap: 0.45rem; font-size: 0.78rem; color: var(--ink-light); }
+  .legend-swatch { width: 22px; height: 14px; border-radius: 3px; }
+
+  .divider { width: 60px; height: 1px; background: var(--ink-faint); margin: 1.5rem auto; opacity: 0.3; }
+
   .info-panel {
-    margin-top: 0; max-width: 680px; width: 100%;
+    max-width: 640px; width: 100%;
     background: var(--paper-warm); border-left: 3px solid var(--gold);
-    padding: 1rem 1.5rem; border-radius: 0 4px 4px 0;
-    min-height: 3.5rem; font-size: 0.85rem; color: var(--ink-light); letter-spacing: 0.05em;
+    padding: 1rem 1.5rem; border-radius: 0 6px 6px 0;
+    min-height: 4rem; font-size: 0.88rem; color: var(--ink-light);
   }
-  .info-panel .info-title { font-size: 1rem; color: var(--ink); margin-bottom: 0.3rem; }
+  .info-panel .info-title { font-size: 1rem; color: var(--ink); margin-bottom: 0.4rem; font-weight: 400; }
+  .info-panel .info-row { margin-top: 0.25rem; }
 </style>
 </head>
 <body>
-<a href="../../index.html" style="position:fixed;top:1rem;left:1rem;font-size:0.8rem;color:var(--ink-faint);text-decoration:none;letter-spacing:0.1em;z-index:100;">← 主页</a>
+<a class="back-link" href="../../index.html">← 主页</a>
+
 <header>
   <h1>雅　历</h1>
   <div class="subtitle">中华节假日 · 农历 · 节气</div>
@@ -91,10 +126,10 @@
 </div>
 
 <div class="legend">
-  <div class="legend-item"><div class="legend-dot" style="background:#2c2c2c"></div>今日</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div>法定假日</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#4a7c59"></div>调休补班</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#c9a84c"></div>节气</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--today-bg)"></div>今日</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--holiday-bg);border:1px solid #b8dfc4"></div>法定假日</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--workday-bg);border:1px solid #f0c4be"></div>调休补班</div>
+  <div class="legend-item"><span style="color:var(--gold);font-size:0.85rem">节气</span></div>
 </div>
 <div class="divider"></div>
 <div class="info-panel" id="infoPanel">
@@ -162,6 +197,7 @@ function getLunar(date){
       if(p.type==='month') month=p.value;
       if(p.type==='day') day=p.value;
     }
+    // 初一显示月份名，其他显示日期（"初二"、"十五"等中文写法）
     return day==='初一' ? month+'月' : day;
   } catch(e){ return ''; }
 }
@@ -182,7 +218,7 @@ function render(){
     const dow=date.getDay();
     const isToday=(curYear===today.getFullYear()&&curMonth===today.getMonth()&&d===today.getDate());
     const holiday=HOLIDAYS[k], workday=WORKDAYS[k], jieqi=JIEQI[k];
-    const isWeekend=(dow===0||dow===6)&&!workday;
+    const isWeekend=(dow===0||dow===6)&&!workday&&!holiday;
     const lunar=getLunar(date);
 
     const el=document.createElement('div');
@@ -191,12 +227,12 @@ function render(){
     else if(holiday) cls+=' holiday';
     else if(workday) cls+=' workday';
     else if(isWeekend) cls+=' weekend';
+    else cls+=' normal';
     el.className=cls;
 
-    el.innerHTML=`<span class="num">${d}</span><span class="lunar">${lunar}</span>`
-      +(jieqi?`<span class="jieqi">${jieqi}</span>`:'')
-      +(holiday&&!isToday?`<span class="tag">${holiday.name}</span>`:'')
-      +(workday&&!isToday?`<span class="tag">班</span>`:'');
+    el.innerHTML=`<span class="num">${d}</span>`
+      +`<span class="lunar">${lunar}</span>`
+      +(jieqi?`<span class="jieqi">${jieqi}</span>`:'');
 
     el.addEventListener('click',()=>showInfo(date,k,holiday,workday,jieqi,lunar));
     grid.appendChild(el);
@@ -206,10 +242,10 @@ function render(){
 function showInfo(date,k,holiday,workday,jieqi,lunar){
   const weeks=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
   let html=`<div class="info-title">${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日　${weeks[date.getDay()]}</div>`;
-  html+=`<div style="margin-top:0.3rem;color:var(--ink-faint)">农历 ${lunar}</div>`;
-  if(jieqi) html+=`<div style="margin-top:0.3rem;color:var(--gold)">节气：${jieqi}</div>`;
-  if(holiday) html+=`<div style="margin-top:0.3rem;color:var(--red)">法定假日：${holiday.name}</div>`;
-  if(workday) html+=`<div style="margin-top:0.3rem;color:var(--green)">调休补班：${workday}</div>`;
+  html+=`<div class="info-row" style="color:var(--ink-faint)">农历 ${lunar}</div>`;
+  if(jieqi) html+=`<div class="info-row" style="color:var(--gold)">节气：${jieqi}</div>`;
+  if(holiday) html+=`<div class="info-row" style="color:var(--holiday-text)">法定假日：${holiday.name}</div>`;
+  if(workday) html+=`<div class="info-row" style="color:var(--workday-text)">调休补班：${workday}</div>`;
   document.getElementById('infoPanel').innerHTML=html;
 }
 
