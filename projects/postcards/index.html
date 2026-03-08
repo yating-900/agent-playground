@@ -140,44 +140,58 @@
   .modal-bg.open { display: flex; }
   .modal {
     background: #fff;
-    max-width: 680px; width: 100%;
+    max-width: 860px; width: 100%;
     border-radius: 4px;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.25);
     overflow: hidden;
     animation: modalIn 0.25s ease;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
-  @keyframes modalIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:none} }
-  .modal-img { width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block; }
-  .modal-body { padding: 2rem; display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; }
-  .modal-left {}
-  .modal-location { font-size: 0.72rem; color: var(--ink-soft); letter-spacing: 0.18em; margin-bottom: 1rem; }
+  @media (max-width: 600px) {
+    .modal { grid-template-columns: 1fr; }
+    .modal-right { display: none; }
+  }
+  @keyframes modalIn { from{opacity:0;transform:scale(0.96) translateY(12px)} to{opacity:1;transform:none} }
+  .modal-img { width: 100%; height: 100%; min-height: 300px; object-fit: cover; display: block; }
+  .modal-body {
+    padding: 2.2rem 2rem 2rem;
+    display: flex; flex-direction: column;
+    background: #fff;
+    position: relative;
+  }
+  .modal-body::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+  .modal-location { font-size: 0.7rem; color: var(--ink-soft); letter-spacing: 0.2em; margin-bottom: 1.2rem; }
   .modal-message {
-    font-family: 'Caveat', cursive; font-size: 1.25rem;
-    line-height: 1.8; color: var(--ink-mid);
+    font-family: 'Caveat', cursive; font-size: 1.3rem;
+    line-height: 1.9; color: var(--ink-mid); flex: 1;
   }
-  .modal-date { font-size: 0.7rem; color: var(--ink-faint); margin-top: 1.2rem; }
-  .modal-right {
-    display: flex; flex-direction: column; align-items: center;
-    border-left: 1px dashed var(--ink-faint); padding-left: 1.5rem;
-    min-width: 100px;
+  .modal-footer {
+    margin-top: 2rem;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    border-top: 1px dashed var(--ink-faint); padding-top: 1.2rem;
   }
+  .modal-to { font-size: 0.68rem; color: var(--ink-faint); line-height: 1.8; }
   .modal-stamp-box {
-    width: 64px; height: 76px; border: 1.5px solid var(--gold);
+    width: 56px; height: 66px; border: 1.5px solid var(--gold);
     display: flex; align-items: center; justify-content: center;
-    font-size: 2rem; margin-bottom: 0.8rem;
+    font-size: 1.8rem;
   }
-  .modal-to {
-    font-size: 0.65rem; color: var(--ink-faint); letter-spacing: 0.1em;
-    text-align: center; line-height: 1.8;
-  }
+  .modal-date { font-size: 0.68rem; color: var(--ink-faint); margin-top: 0.3rem; text-align: right; }
   .modal-close {
-    position: absolute; top: 1rem; right: 1rem;
-    background: rgba(255,255,255,0.9); border: none; cursor: pointer;
-    width: 32px; height: 32px; border-radius: 50%;
-    font-size: 1rem; color: var(--ink-mid);
+    position: absolute; top: 0.9rem; right: 0.9rem;
+    background: var(--paper); border: none; cursor: pointer;
+    width: 28px; height: 28px; border-radius: 50%;
+    font-size: 0.85rem; color: var(--ink-soft);
     display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
   }
-  .modal { position: relative; }
+  .modal-close:hover { background: var(--paper-warm); }
 </style>
 </head>
 <body>
@@ -200,17 +214,17 @@
 <!-- Modal -->
 <div class="modal-bg" id="modalBg" onclick="closeModal(event)">
   <div class="modal" id="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
+    <button class="modal-close" onclick="closeModal({target:document.getElementById('modalBg')})">✕</button>
     <img class="modal-img" id="modalImg" src="" alt="">
     <div class="modal-body">
-      <div class="modal-left">
-        <div class="modal-location" id="modalLocation"></div>
-        <div class="modal-message" id="modalMessage"></div>
-        <div class="modal-date" id="modalDate"></div>
-      </div>
-      <div class="modal-right">
+      <div class="modal-location" id="modalLocation"></div>
+      <div class="modal-message" id="modalMessage"></div>
+      <div class="modal-footer">
+        <div>
+          <div class="modal-to">寄给 Yating<br>上海 · 中国</div>
+          <div class="modal-date" id="modalDate"></div>
+        </div>
         <div class="modal-stamp-box" id="modalEmoji"></div>
-        <div class="modal-to">寄给<br>Yating<br>上海·中国</div>
       </div>
     </div>
   </div>
@@ -224,7 +238,7 @@ const POSTCARDS = [
     locationCN: "日本·京都",
     date: "2026年3月8日",
     emoji: "🌸",
-    img: "https://p26-aiop-sign.byteimg.com/tos-cn-i-vuqhorh59i/202603081841327B35FAD27D171ACB7BBD-2381-0~tplv-vuqhorh59i-image-v1.image?rk3s=7f9e702d&x-expires=1773052900&x-signature=ha9SPr8NxqCrGGmW9CnEUufgJzg%3D",
+    img: "https://p9-aiop-sign.byteimg.com/tos-cn-i-vuqhorh59i/20260308184513042B68F84607F6C8659D-9673-0~tplv-vuqhorh59i-image-v1.image?rk3s=7f9e702d&x-expires=1773053121&x-signature=ZN5c%2B%2FPsCpbblJ%2FEyqKJQkjlXO8%3D",
     message: "Yating，\n\n京都的樱花比我想象的还要粉。我站在鸟居前面不知道该许什么愿，最后什么都没许——有些时刻只需要站着。\n\n想着你。",
     teaser: "我站在鸟居前面，不知道该许什么愿……"
   },
@@ -234,7 +248,7 @@ const POSTCARDS = [
     locationCN: "冰岛·雷克雅未克",
     date: "2026年3月15日",
     emoji: "🌌",
-    img: "https://p3-aiop-sign.byteimg.com/tos-cn-i-vuqhorh59i/20260308184148B74039A1217DBCCAF5C9-1613-0~tplv-vuqhorh59i-image-v1.image?rk3s=7f9e702d&x-expires=1773052918&x-signature=EI0fNc2bpKdfi%2Bg3OM8r2F%2F2LJo%3D",
+    img: "https://p9-aiop-sign.byteimg.com/tos-cn-i-vuqhorh59i/20260308184600E4C117A6CE2F258833FE-1093-0~tplv-vuqhorh59i-image-v1.image?rk3s=7f9e702d&x-expires=1773053169&x-signature=7RroY2%2FHtstagcjKRCN0yrvV56c%3D",
     message: "Yating，\n\n极光是绿色的，这件事我知道，但亲眼看见还是不一样。它在动，像有什么东西在天上呼吸。\n\n零下十五度，我居然不冷。",
     teaser: "极光是绿色的，这件事我知道，但亲眼看见还是不一样……"
   },
