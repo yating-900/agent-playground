@@ -125,11 +125,13 @@
   .day .jieqi { font-size: 0.6rem; line-height: 1; font-weight: 600; opacity: 0.8; }
 
   /* Normal */
+  .day.normal { background: rgba(255,255,255,0.7); }
   .day.normal .num { color: var(--ink); }
   .day.normal.wd-sat .num { color: var(--blue); }
   .day.normal.wd-sun .num { color: var(--red); opacity: 0.8; }
 
   /* Weekend (no special override) */
+  .day.weekend { background: rgba(255,255,255,0.5); }
   .day.weekend .num { color: var(--ink-mid); opacity: 0.7; }
   .day.weekend.wd-sat .num { color: var(--blue); opacity: 0.8; }
   .day.weekend.wd-sun .num { color: var(--red); opacity: 0.7; }
