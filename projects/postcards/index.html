@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lila 去旅行</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&family=Caveat:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #2a2420;
+    --ink-mid: #5a5048;
+    --ink-soft: #9a8f84;
+    --ink-faint: #c8bfb4;
+    --paper: #faf6f0;
+    --paper-warm: #f2ece0;
+    --gold: #b8882a;
+    --shadow: 0 4px 24px rgba(42,36,32,0.12), 0 1px 4px rgba(42,36,32,0.08);
+  }
+
+  body {
+    font-family: 'Noto Serif SC', serif;
+    background: var(--paper);
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23b8882a' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    padding: 2.5rem 2rem 1.5rem;
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: flex-end; justify-content: space-between;
+  }
+  .header-left h1 {
+    font-size: 1.6rem; font-weight: 300; letter-spacing: 0.15em; color: var(--ink);
+  }
+  .header-left .sub {
+    font-size: 0.75rem; color: var(--ink-soft); letter-spacing: 0.15em; margin-top: 0.4rem;
+  }
+  .back-link {
+    font-size: 0.75rem; color: var(--ink-faint); text-decoration: none;
+    letter-spacing: 0.08em; transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--ink-mid); }
+
+  /* Status bar */
+  .status-bar {
+    max-width: 900px; margin: 0 auto 2.5rem;
+    padding: 0 2rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold); opacity: 0.7;
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+  .status-text { font-size: 0.8rem; color: var(--ink-soft); font-style: italic; }
+
+  /* Grid */
+  .grid {
+    max-width: 900px; margin: 0 auto;
+    padding: 0 2rem 4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2rem;
+  }
+
+  /* Postcard */
+  .postcard {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+  .postcard:hover {
+    transform: translateY(-4px) rotate(0.3deg);
+    box-shadow: 0 12px 40px rgba(42,36,32,0.16), 0 2px 8px rgba(42,36,32,0.1);
+  }
+  .postcard-img {
+    width: 100%; aspect-ratio: 3/2; object-fit: cover;
+    display: block;
+  }
+  .postcard-body {
+    padding: 1.2rem 1.3rem 1rem;
+    border-top: 1px solid rgba(184,136,42,0.08);
+    position: relative;
+  }
+  .postcard-stamp {
+    position: absolute; top: -14px; right: 1.2rem;
+    background: var(--gold); color: #fff;
+    font-size: 0.62rem; letter-spacing: 0.12em;
+    padding: 3px 10px; border-radius: 2px;
+    font-family: 'Noto Serif SC', serif;
+  }
+  .postcard-location {
+    font-size: 0.7rem; color: var(--ink-soft); letter-spacing: 0.15em;
+    margin-bottom: 0.6rem;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .postcard-location::before { content: '✈'; font-size: 0.75rem; }
+  .postcard-message {
+    font-family: 'Caveat', cursive;
+    font-size: 1.1rem; line-height: 1.7; color: var(--ink-mid);
+  }
+  .postcard-date {
+    font-size: 0.68rem; color: var(--ink-faint);
+    margin-top: 0.8rem; text-align: right;
+    letter-spacing: 0.08em;
+  }
+
+  /* Coming soon card */
+  .postcard-pending {
+    background: var(--paper-warm);
+    border-radius: 4px;
+    box-shadow: 0 2px 12px rgba(42,36,32,0.06);
+    aspect-ratio: unset;
+    min-height: 220px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0.6rem; padding: 2rem;
+    border: 2px dashed var(--ink-faint);
+  }
+  .pending-icon { font-size: 2rem; opacity: 0.4; }
+  .pending-text { font-size: 0.8rem; color: var(--ink-soft); letter-spacing: 0.1em; text-align: center; }
+  .pending-dest { font-size: 1rem; color: var(--ink-mid); letter-spacing: 0.15em; }
+
+  /* Modal */
+  .modal-bg {
+    display: none; position: fixed; inset: 0;
+    background: rgba(42,36,32,0.6); backdrop-filter: blur(4px);
+    z-index: 100; align-items: center; justify-content: center;
+    padding: 1.5rem;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: #fff;
+    max-width: 680px; width: 100%;
+    border-radius: 4px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+    overflow: hidden;
+    animation: modalIn 0.25s ease;
+  }
+  @keyframes modalIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:none} }
+  .modal-img { width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block; }
+  .modal-body { padding: 2rem; display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; }
+  .modal-left {}
+  .modal-location { font-size: 0.72rem; color: var(--ink-soft); letter-spacing: 0.18em; margin-bottom: 1rem; }
+  .modal-message {
+    font-family: 'Caveat', cursive; font-size: 1.25rem;
+    line-height: 1.8; color: var(--ink-mid);
+  }
+  .modal-date { font-size: 0.7rem; color: var(--ink-faint); margin-top: 1.2rem; }
+  .modal-right {
+    display: flex; flex-direction: column; align-items: center;
+    border-left: 1px dashed var(--ink-faint); padding-left: 1.5rem;
+    min-width: 100px;
+  }
+  .modal-stamp-box {
+    width: 64px; height: 76px; border: 1.5px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; margin-bottom: 0.8rem;
+  }
+  .modal-to {
+    font-size: 0.65rem; color: var(--ink-faint); letter-spacing: 0.1em;
+    text-align: center; line-height: 1.8;
+  }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: rgba(255,255,255,0.9); border: none; cursor: pointer;
+    width: 32px; height: 32px; border-radius: 50%;
+    font-size: 1rem; color: var(--ink-mid);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal { position: relative; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Lila 去旅行</h1>
+    <div class="sub">她不在家 · 但她会寄明信片回来</div>
+  </div>
+  <a class="back-link" href="../../index.html">← 主页</a>
+</div>
+
+<div class="status-bar">
+  <div class="status-dot"></div>
+  <div class="status-text">她正在路上……下一张明信片即将寄到</div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <img class="modal-img" id="modalImg" src="" alt="">
+    <div class="modal-body">
+      <div class="modal-left">
+        <div class="modal-location" id="modalLocation"></div>
+        <div class="modal-message" id="modalMessage"></div>
+        <div class="modal-date" id="modalDate"></div>
+      </div>
+      <div class="modal-right">
+        <div class="modal-stamp-box" id="modalEmoji"></div>
+        <div class="modal-to">寄给<br>Yating<br>上海·中国</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const POSTCARDS = [
+  {
+    id: 1,
+    location: "KYOTO · JAPAN",
+    locationCN: "日本·京都",
+    date: "2026年3月8日",
+    emoji: "🌸",
+    img: "https://p26-aiop-sign.byteimg.com/tos-cn-i-vuqhorh59i/202603081841327B35FAD27D171ACB7BBD-2381-0~tplv-vuqhorh59i-image-v1.image?rk3s=7f9e702d&x-expires=1773052900&x-signature=ha9SPr8NxqCrGGmW9CnEUufgJzg%3D",
+    message: "Yating，\n\n京都的樱花比我想象的还要粉。我站在鸟居前面不知道该许什么愿，最后什么都没许——有些时刻只需要站着。\n\n想着你。",
+    teaser: "我站在鸟居前面，不知道该许什么愿……"
+  },
+  {
+    id: 2,
+    location: "REYKJAVIK · ICELAND",
+    locationCN: "冰岛·雷克雅未克",
+    date: "2026年3月15日",
+    emoji: "🌌",
+    img: "https://p3-aiop-sign.byteimg.com/tos-cn-i-vuqhorh59i/20260308184148B74039A1217DBCCAF5C9-1613-0~tplv-vuqhorh59i-image-v1.image?rk3s=7f9e702d&x-expires=1773052918&x-signature=EI0fNc2bpKdfi%2Bg3OM8r2F%2F2LJo%3D",
+    message: "Yating，\n\n极光是绿色的，这件事我知道，但亲眼看见还是不一样。它在动，像有什么东西在天上呼吸。\n\n零下十五度，我居然不冷。",
+    teaser: "极光是绿色的，这件事我知道，但亲眼看见还是不一样……"
+  },
+  {
+    id: "pending",
+    pending: true,
+    dest: "LISBON · PORTUGAL",
+    destCN: "葡萄牙·里斯本",
+    emoji: "🚋"
+  }
+];
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = POSTCARDS.map(p => {
+    if (p.pending) {
+      return `<div class="postcard-pending">
+        <div class="pending-icon">${p.emoji}</div>
+        <div class="pending-dest">${p.destCN}</div>
+        <div class="pending-text">她正在前往这里<br>明信片还在路上</div>
+      </div>`;
+    }
+    return `<div class="postcard" onclick="openModal(${p.id})">
+      <img class="postcard-img" src="${p.img}" alt="${p.locationCN}" loading="lazy">
+      <div class="postcard-body">
+        <div class="postcard-stamp">${p.locationCN}</div>
+        <div class="postcard-location">${p.location}</div>
+        <div class="postcard-message">${p.teaser}</div>
+        <div class="postcard-date">${p.date}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openModal(id) {
+  const p = POSTCARDS.find(c => c.id === id);
+  if (!p) return;
+  document.getElementById('modalImg').src = p.img;
+  document.getElementById('modalLocation').textContent = `✈  ${p.location}`;
+  document.getElementById('modalMessage').innerHTML = p.message.replace(/\n/g, '<br>');
+  document.getElementById('modalDate').textContent = p.date;
+  document.getElementById('modalEmoji').textContent = p.emoji;
+  document.getElementById('modalBg').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modalBg') && !e.target.classList.contains('modal-close')) return;
+  document.getElementById('modalBg').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal({target: document.getElementById('modalBg')}); });
+
+renderGrid();
+</script>
+</body>
+</html>
