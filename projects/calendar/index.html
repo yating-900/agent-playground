@@ -21,6 +21,8 @@
     background: var(--paper); color: var(--ink);
     min-height: 100vh; display: flex; flex-direction: column;
     align-items: center; padding: 1.5rem 1rem 3rem;
+    background-image: radial-gradient(circle at 20% 20%, rgba(185,146,42,0.04) 0%, transparent 60%),
+                      radial-gradient(circle at 80% 80%, rgba(185,146,42,0.03) 0%, transparent 50%);
   }
   .back-link {
     position: fixed; top: 0.8rem; left: 1rem;
@@ -28,8 +30,10 @@
     text-decoration: none; letter-spacing: 0.05em; z-index: 100;
   }
   .back-link:hover { color: var(--ink); }
-  header { text-align: center; margin-bottom: 1.2rem; }
-  header h1 { font-size: 1.8rem; font-weight: 300; letter-spacing: 0.4em; }
+  header { text-align: center; margin-bottom: 1.2rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+  header svg { width: 52px; height: 52px; }
+  header h1 { font-size: 1.6rem; font-weight: 300; letter-spacing: 0.45em; }
+  .header-rule { width: 40px; height: 1.5px; background: var(--gold); opacity: 0.5; border-radius: 1px; }
   .nav { display: flex; align-items: center; gap: 2rem; margin-bottom: 1rem; }
   .nav button {
     background: none; border: none; cursor: pointer;
@@ -63,8 +67,10 @@
   .day .lunar { font-size: 0.68rem; line-height: 1; color: inherit; opacity: 0.7; }
   .day .jieqi { font-size: 0.68rem; line-height: 1; color: inherit; opacity: 0.7; font-weight: 600; }
 
-  /* Normal */
-  .day.normal .num { color: var(--ink); }
+  /* Weekend column tint */
+  .day.weekend-sat .num { color: var(--weekend); }
+  .day.weekend-sun .num { color: #b03020; }
+  .day.normal.weekend-sat, .day.normal.weekend-sun { background: rgba(107,143,160,0.04); }
 
   .day.selected { outline: 2px solid var(--gold); outline-offset: 1px; }
   .day.today.selected { outline: 2px solid var(--gold); outline-offset: 1px; }
@@ -85,11 +91,23 @@
   .day.today .lunar { color: rgba(255,255,255,0.5); opacity: 1; }
   .day.today .jieqi { color: var(--gold); }
 
-  .calendar-wrap { width: 100%; max-width: 640px; }
+  .calendar-wrap {
+    width: 100%; max-width: 640px;
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 2px 24px rgba(44,44,44,0.07), 0 0 0 1px rgba(185,146,42,0.08);
+    padding: 1.2rem 1.2rem 1rem;
+  }
   .legend { display: flex; gap: 1.2rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--ink-light); }
   .legend-swatch { width: 18px; height: 12px; border-radius: 3px; }
 
+  .upcoming-wrap {
+    max-width: 640px; width: 100%; margin-top: 1.2rem;
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 2px 24px rgba(44,44,44,0.07), 0 0 0 1px rgba(185,146,42,0.08);
+    padding: 1.2rem 1.5rem;
+  }
+  .upcoming-label { font-size: 0.72rem; color: var(--ink-faint); letter-spacing: 0.2em; margin-bottom: 0.8rem; }
   .upcoming-item {
     display: flex; align-items: baseline; gap: 1rem;
     padding: 0.7rem 0; border-bottom: 1px solid var(--paper-warm);
@@ -106,7 +124,23 @@
 <a class="back-link" href="../../index.html">← 主页</a>
 
 <header>
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <rect x="91" y="34" width="18" height="13" rx="3.5" fill="#b8922a"/>
+    <rect x="79" y="53" width="18" height="13" rx="3.5" fill="#b8922a"/>
+    <rect x="103" y="53" width="18" height="13" rx="3.5" fill="#b8922a"/>
+    <rect x="67" y="72" width="18" height="13" rx="3.5" fill="#b8922a"/>
+    <rect x="91" y="72" width="18" height="13" rx="3.5" fill="#b8922a"/>
+    <rect x="115" y="72" width="18" height="13" rx="3.5" fill="#b8922a"/>
+    <rect x="67" y="91" width="18" height="13" rx="3.5" fill="#c9a040"/>
+    <rect x="91" y="91" width="18" height="13" rx="3.5" fill="#c9a040"/>
+    <rect x="115" y="91" width="18" height="13" rx="3.5" fill="#c9a040"/>
+    <rect x="79" y="110" width="18" height="13" rx="3.5" fill="#d4b060"/>
+    <rect x="103" y="110" width="18" height="13" rx="3.5" fill="#d4b060"/>
+    <line x1="100" y1="123" x2="100" y2="164" stroke="#2c2c2c" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M100,150 Q87,143 80,134" stroke="#2c2c2c" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </svg>
   <h1>麦序日历</h1>
+  <div class="header-rule"></div>
 </header>
 
 <div class="nav">
@@ -127,8 +161,8 @@
   <div class="legend-item"><div class="legend-swatch" style="background:var(--workday-bg);border:1px solid #f0c4be"></div>调休补班</div>
 </div>
 
-<div class="upcoming-wrap" style="max-width:640px;width:100%;margin-top:1.5rem">
-  <div style="font-size:0.82rem;color:var(--ink-faint);letter-spacing:0.15em;margin-bottom:0.8rem">即将放假</div>
+<div class="upcoming-wrap">
+  <div class="upcoming-label">即将放假</div>
   <div id="upcomingList"></div>
 </div>
 
@@ -294,6 +328,8 @@ function render(){
     else if(workday) cls+=' workday';
     else if(isWeekend) cls+=' weekend';
     else cls+=' normal';
+    if(dow===6) cls+=' weekend-sat';
+    if(dow===0) cls+=' weekend-sun';
     el.className=cls;
 
     const subLine = jieqi ? '<span class="jieqi">'+jieqi+'</span>' : lunar;
