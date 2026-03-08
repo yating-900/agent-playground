@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>即梦画图</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #2c2c2c; --ink-light: #5a5a5a; --ink-faint: #a0978a;
+    --paper: #faf8f4; --paper-warm: #f0ebe0;
+    --gold: #c9a84c; --gold-soft: #f5edd8;
+    --red: #c0392b;
+  }
+  body {
+    font-family: 'Noto Serif SC', 'STSong', serif;
+    background: var(--paper); color: var(--ink);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; padding: 2rem 1rem 4rem;
+  }
+  .back-link {
+    position: fixed; top: 1rem; left: 1rem;
+    font-size: 0.85rem; color: var(--ink-faint); text-decoration: none; z-index: 100;
+  }
+  .back-link:hover { color: var(--ink); }
+  header { text-align: center; margin-bottom: 2.5rem; }
+  header h1 { font-size: 1.8rem; font-weight: 300; letter-spacing: 0.3em; margin-bottom: 0.3rem; }
+  header .subtitle { font-size: 0.8rem; color: var(--ink-faint); letter-spacing: 0.15em; }
+
+  .form-wrap { width: 100%; max-width: 600px; }
+
+  textarea {
+    width: 100%; min-height: 100px; padding: 1rem;
+    font-family: inherit; font-size: 0.95rem; color: var(--ink);
+    background: var(--paper-warm); border: 1px solid #ddd6c8;
+    border-radius: 6px; resize: vertical; outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: 0.03em;
+  }
+  textarea:focus { border-color: var(--gold); }
+  textarea::placeholder { color: var(--ink-faint); }
+
+  .options { display: flex; gap: 1rem; margin-top: 0.8rem; align-items: center; flex-wrap: wrap; }
+  .size-select {
+    display: flex; gap: 0.5rem;
+  }
+  .size-btn {
+    padding: 0.35rem 0.8rem; border: 1px solid #ddd6c8; border-radius: 20px;
+    background: none; cursor: pointer; font-family: inherit; font-size: 0.8rem;
+    color: var(--ink-light); transition: all 0.15s;
+  }
+  .size-btn.active, .size-btn:hover { background: var(--gold-soft); border-color: var(--gold); color: var(--ink); }
+
+  .generate-btn {
+    margin-left: auto; padding: 0.5rem 1.8rem;
+    background: var(--ink); color: var(--paper);
+    border: none; border-radius: 4px; cursor: pointer;
+    font-family: inherit; font-size: 0.9rem; letter-spacing: 0.1em;
+    transition: background 0.2s;
+  }
+  .generate-btn:hover { background: #444; }
+  .generate-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+  .status { margin-top: 1rem; font-size: 0.82rem; color: var(--ink-faint); min-height: 1.2rem; text-align: center; }
+  .status.error { color: var(--red); }
+
+  .result { margin-top: 1.5rem; text-align: center; }
+  .result img {
+    max-width: 100%; border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    display: none;
+  }
+  .result img.loaded { display: block; margin: 0 auto; }
+
+  .result-actions {
+    display: none; gap: 0.8rem; justify-content: center; margin-top: 0.8rem;
+  }
+  .result-actions.show { display: flex; }
+  .result-actions a, .result-actions button {
+    font-family: inherit; font-size: 0.8rem; color: var(--ink-faint);
+    text-decoration: none; background: none; border: none; cursor: pointer; padding: 0;
+  }
+  .result-actions a:hover, .result-actions button:hover { color: var(--ink); }
+
+  .history { margin-top: 2.5rem; width: 100%; max-width: 600px; }
+  .history h2 { font-size: 0.78rem; color: var(--ink-faint); letter-spacing: 0.15em; margin-bottom: 0.8rem; }
+  .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .history-thumb {
+    aspect-ratio: 1; border-radius: 4px; overflow: hidden; cursor: pointer;
+    background: var(--paper-warm);
+  }
+  .history-thumb img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s; }
+  .history-thumb:hover img { opacity: 0.8; }
+
+  .loading-dots::after {
+    content: ''; animation: dots 1.2s steps(3, end) infinite;
+  }
+  @keyframes dots {
+    0%   { content: ''; }
+    33%  { content: '.'; }
+    66%  { content: '..'; }
+    100% { content: '...'; }
+  }
+</style>
+</head>
+<body>
+<a class="back-link" href="../../index.html">← 主页</a>
+
+<header>
+  <h1>即 梦</h1>
+  <div class="subtitle">AI 图像生成 · 火山引擎</div>
+</header>
+
+<div class="form-wrap">
+  <textarea id="promptInput" placeholder="描述你想生成的画面……&#10;例如：初春的江南水乡，烟雨朦胧，水墨风格"></textarea>
+  <div class="options">
+    <div class="size-select" id="sizeSelect">
+      <button class="size-btn active" data-w="512" data-h="512">1:1</button>
+      <button class="size-btn" data-w="768" data-h="512">横</button>
+      <button class="size-btn" data-w="512" data-h="768">竖</button>
+    </div>
+    <button class="generate-btn" id="genBtn" onclick="generate()">生 成</button>
+  </div>
+  <div class="status" id="status"></div>
+
+  <div class="result">
+    <img id="resultImg" alt="生成结果">
+    <div class="result-actions" id="resultActions">
+      <a id="downloadLink" download="jimeng.jpg">↓ 下载</a>
+      <span style="color:#ddd">·</span>
+      <button onclick="generate()">再生成一张</button>
+    </div>
+  </div>
+</div>
+
+<div class="history" id="historySection" style="display:none">
+  <h2>历史记录</h2>
+  <div class="history-grid" id="historyGrid"></div>
+</div>
+
+<script>
+const API_PROXY = 'http://localhost:18790/jimeng';
+let selectedW = 512, selectedH = 512;
+const history = JSON.parse(localStorage.getItem('jimeng_history') || '[]');
+
+// Size buttons
+document.getElementById('sizeSelect').addEventListener('click', e => {
+  const btn = e.target.closest('.size-btn');
+  if (!btn) return;
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedW = parseInt(btn.dataset.w);
+  selectedH = parseInt(btn.dataset.h);
+});
+
+function setStatus(msg, isError=false) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (isError ? ' error' : '');
+}
+
+async function generate() {
+  const prompt = document.getElementById('promptInput').value.trim();
+  if (!prompt) { setStatus('请先输入描述', true); return; }
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  document.getElementById('resultImg').classList.remove('loaded');
+  document.getElementById('resultActions').classList.remove('show');
+
+  // Show loading
+  const statusEl = document.getElementById('status');
+  statusEl.innerHTML = '<span class="loading-dots">生成中</span>';
+  statusEl.className = 'status';
+
+  try {
+    const resp = await fetch(API_PROXY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, width: selectedW, height: selectedH }),
+    });
+    if (!resp.ok) throw new Error('proxy error');
+    const data = await resp.json();
+    if (data.url) {
+      showResult(data.url, prompt);
+    } else {
+      throw new Error(data.error || '未知错误');
+    }
+  } catch(e) {
+    // Proxy not available — show instruction
+    setStatus('⚠️ 网页版需要本地代理。请在 Discord/Slack 对 Lila 说"帮我画：' + prompt + '"', true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function showResult(url, prompt) {
+  setStatus('✓ 生成成功');
+  const img = document.getElementById('resultImg');
+  img.src = url;
+  img.onload = () => {
+    img.classList.add('loaded');
+    document.getElementById('resultActions').classList.add('show');
+    document.getElementById('downloadLink').href = url;
+  };
+  img.onerror = () => {
+    setStatus('图片链接已失效（链接有效期约1小时），请重新生成', true);
+  };
+
+  // Save to history
+  history.unshift({ url, prompt, time: Date.now() });
+  if (history.length > 20) history.pop();
+  localStorage.setItem('jimeng_history', JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory() {
+  const items = history.filter(h => h.url);
+  if (!items.length) return;
+  document.getElementById('historySection').style.display = '';
+  const grid = document.getElementById('historyGrid');
+  grid.innerHTML = items.map(h =>
+    `<div class="history-thumb" title="${h.prompt}" onclick="loadFromHistory('${h.url}','${h.prompt.replace(/'/g,"\\'")}')">
+      <img src="${h.url}" loading="lazy">
+    </div>`
+  ).join('');
+}
+
+function loadFromHistory(url, prompt) {
+  document.getElementById('promptInput').value = prompt;
+  showResult(url, prompt);
+}
+
+// Keyboard shortcut
+document.getElementById('promptInput').addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') generate();
+});
+
+renderHistory();
+</script>
+</body>
+</html>
