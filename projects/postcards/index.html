@@ -5,224 +5,222 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lila 去旅行</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&family=Caveat:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&family=Caveat:wght@400;500;600&family=Special+Elite&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
     --ink: #2a2218;
-    --ink-mid: #5c4e3a;
+    --ink-mid: #4a3c2c;
     --ink-soft: #8a7a68;
-    --ink-faint: #c0b09a;
-    --paper: #f4ede0;
-    --paper-aged: #ede0c8;
-    --wood: #c49a6c;
+    --ink-faint: #c0a888;
+    --paper: #f7f0e2;
+    --paper-line: rgba(180,150,100,0.18);
+    --wood-dark: #4a3020;
     --gold: #b8882a;
-    --stamp-red: #c0392b;
+    --stamp-red: #b03020;
   }
 
   body {
     font-family: 'Noto Serif SC', serif;
-    background-color: #6b4c2a;
-    background-image:
-      repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 40px),
-      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 40px),
-      linear-gradient(135deg, #7a5a35 0%, #5a3d1e 40%, #6b4c2a 70%, #5a3d1e 100%);
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 48px),
+      repeating-linear-gradient(0deg,  rgba(0,0,0,0.04) 0, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 48px),
+      linear-gradient(160deg, #6b4823 0%, #4a3018 40%, #5e3f20 70%, #3d2810 100%);
     min-height: 100vh;
-    padding-bottom: 4rem;
+    padding-bottom: 5rem;
   }
 
-  /* Header */
+  /* ── Header ── */
   .header {
-    padding: 2rem 2rem 1rem;
-    max-width: 860px; margin: 0 auto;
+    padding: 2.2rem 2rem 0.8rem;
+    max-width: 880px; margin: 0 auto;
     display: flex; align-items: flex-end; justify-content: space-between;
   }
-  .header h1 {
-    font-size: 1.4rem; font-weight: 300; letter-spacing: 0.2em;
-    color: #f0e0c4;
-  }
-  .header .sub {
-    font-size: 0.72rem; color: rgba(240,224,196,0.5);
-    letter-spacing: 0.15em; margin-top: 0.35rem;
-    font-style: italic;
-  }
-  .back-link {
-    font-size: 0.72rem; color: rgba(240,224,196,0.35);
-    text-decoration: none; letter-spacing: 0.08em; transition: color 0.2s;
-  }
-  .back-link:hover { color: rgba(240,224,196,0.7); }
+  .header h1 { font-size: 1.4rem; font-weight: 300; letter-spacing: 0.2em; color: #f0dfc0; }
+  .header .sub { font-size: 0.7rem; color: rgba(240,223,192,0.4); letter-spacing: 0.12em; margin-top: 0.35rem; font-style: italic; }
+  .back-link { font-size: 0.7rem; color: rgba(240,223,192,0.28); text-decoration: none; letter-spacing: 0.08em; transition: color 0.2s; }
+  .back-link:hover { color: rgba(240,223,192,0.65); }
 
-  /* Status */
+  /* ── Status ── */
   .status {
-    max-width: 860px; margin: 0 auto 2.5rem;
+    max-width: 880px; margin: 1rem auto 2.2rem;
     padding: 0 2rem;
-    display: flex; align-items: center; gap: 0.8rem;
+    display: flex; align-items: center; gap: 0.7rem;
   }
-  .status-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #d4a84a;
-    animation: pulse 3s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
-  .status-text {
-    font-size: 0.75rem; color: rgba(240,224,196,0.45);
-    font-style: italic; letter-spacing: 0.06em;
-  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #d4a84a; animation: pulse 3s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:0.25} 50%{opacity:0.9} }
+  .status-text { font-size: 0.72rem; color: rgba(240,223,192,0.35); font-style: italic; }
 
-  /* Grid */
+  /* ── Grid ── */
   .grid {
-    max-width: 860px; margin: 0 auto;
+    max-width: 880px; margin: 0 auto;
     padding: 0 2rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 2.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 3rem 2.5rem;
   }
 
-  /* ── Postcard flip card ── */
-  .card-scene {
-    perspective: 900px;
-    aspect-ratio: 1.48;
+  /* ── Flip card ── */
+  .scene {
+    aspect-ratio: 1.5 / 1;
+    perspective: 1000px;
     cursor: pointer;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+    transition: filter 0.3s;
   }
-  .card-scene:hover .card-inner { transform: rotateY(-8deg); }
-  .card-scene.flipped .card-inner { transform: rotateY(180deg) !important; }
+  .scene:hover { filter: drop-shadow(0 16px 40px rgba(0,0,0,0.6)); }
+  .scene.flipped .inner { transform: rotateY(180deg); }
 
-  .card-inner {
+  .inner {
     width: 100%; height: 100%;
     position: relative;
     transform-style: preserve-3d;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.45));
+    transition: transform 0.65s cubic-bezier(0.45, 0, 0.15, 1);
   }
 
-  .card-front, .card-back {
+  .face {
     position: absolute; inset: 0;
     backface-visibility: hidden;
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
   }
 
-  /* Front */
-  .card-front { background: #fff; }
-  .card-front img {
-    width: 100%; height: 85%; object-fit: cover; display: block;
-  }
-  .card-front-footer {
-    height: 15%;
-    background: var(--paper-aged);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 0.9rem;
-    border-top: 1px solid rgba(180,150,100,0.3);
-  }
-  .card-location-tag {
-    font-size: 0.62rem; letter-spacing: 0.2em; color: var(--ink-soft);
-    text-transform: uppercase;
-  }
-  .card-date-tag { font-size: 0.6rem; color: var(--ink-faint); }
+  /* ── Front face ── */
+  .front { background: #fff; }
+  .front-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-  /* Back */
-  .card-back {
-    background: var(--paper);
+  /* White strip at bottom with location */
+  .front-strip {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 60%, transparent 100%);
+    padding: 1rem 1rem 0.6rem;
+    display: flex; justify-content: space-between; align-items: flex-end;
+  }
+  .front-loc { font-size: 0.6rem; color: var(--ink-mid); letter-spacing: 0.2em; text-transform: uppercase; }
+  .front-date { font-size: 0.55rem; color: var(--ink-soft); letter-spacing: 0.08em; }
+
+  /* ── Back face ── */
+  .back {
     transform: rotateY(180deg);
-    padding: 0;
-    background-image:
-      linear-gradient(rgba(200,180,140,0.15) 1px, transparent 1px);
-    background-size: 100% 28px;
-    background-position: 0 24px;
+    background: var(--paper);
+    /* lined paper */
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0px, transparent 27px,
+      var(--paper-line) 27px, var(--paper-line) 28px
+    );
+    background-position: 0 32px;
+    display: flex; flex-direction: column;
   }
-  .card-back-inner {
+
+  /* Top red margin line */
+  .back::before {
+    content: ''; display: block;
+    height: 2px;
+    background: linear-gradient(90deg, var(--stamp-red), rgba(176,48,32,0.3) 60%, transparent);
+    flex-shrink: 0;
+  }
+
+  .back-body {
+    flex: 1;
     display: grid;
-    grid-template-columns: 1fr 1px 2.4rem 5rem;
-    height: 100%;
+    grid-template-columns: 1fr 1.5px 44%;
+    min-height: 0;
   }
-  /* Message area */
-  .card-msg {
-    padding: 0.7rem 0.9rem 0.6rem;
-    display: flex; flex-direction: column; gap: 0.2rem;
+
+  /* Left: handwritten message */
+  .back-msg {
+    padding: 0.9rem 0.9rem 0.7rem 1rem;
+    display: flex; flex-direction: column;
   }
-  .card-msg-to {
-    font-size: 0.55rem; color: var(--ink-faint); letter-spacing: 0.1em;
-    margin-bottom: 0.3rem;
-  }
-  .card-msg-text {
+  .back-msg-text {
     font-family: 'Caveat', cursive;
-    font-size: 1.05rem; line-height: 1.75;
+    font-size: 1.05rem; line-height: 1.82;
     color: var(--ink-mid);
     flex: 1;
   }
-  /* Divider */
-  .card-divider {
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent, transparent 4px,
-      rgba(180,150,100,0.4) 4px, rgba(180,150,100,0.4) 5px
-    );
+
+  /* Center divider */
+  .back-divider {
+    background: var(--ink-faint);
+    opacity: 0.35;
+    margin: 0.5rem 0;
   }
-  /* Stamp column */
-  .card-stamp-col {
-    grid-column: 3 / 5;
-    padding: 0.6rem 0.5rem;
+
+  /* Right: stamp + address */
+  .back-right {
+    padding: 0.75rem 0.8rem 0.7rem 0.7rem;
     display: flex; flex-direction: column;
-    align-items: flex-end; gap: 0.5rem;
+    gap: 0.5rem;
   }
-  .card-stamp {
-    width: 44px; height: 52px;
+
+  /* Stamp area */
+  .stamp-area { display: flex; gap: 0.4rem; align-items: flex-start; justify-content: flex-end; }
+
+  .stamp {
+    width: 46px; height: 56px;
     border: 1.5px solid var(--stamp-red);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem;
-    position: relative;
     background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    position: relative;
+    flex-shrink: 0;
   }
-  .card-stamp::before {
+  /* Perforated edge simulation */
+  .stamp::after {
     content: '';
     position: absolute; inset: 2px;
-    border: 0.5px dashed rgba(192,57,43,0.3);
-    pointer-events: none;
-  }
-  .card-postmark {
-    width: 52px; height: 52px;
-    border: 1.5px solid rgba(180,150,100,0.5);
-    border-radius: 50%;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    font-size: 0.42rem; color: var(--ink-faint);
-    letter-spacing: 0.08em; text-align: center;
-    line-height: 1.5;
-    position: relative;
-  }
-  .card-postmark::after {
-    content: ''; position: absolute; inset: 4px;
-    border: 0.5px solid rgba(180,150,100,0.3);
-    border-radius: 50%;
-  }
-  .card-address {
-    font-size: 0.5rem; color: var(--ink-faint);
-    line-height: 1.7; text-align: right;
-    margin-top: auto;
-    padding-bottom: 0.3rem;
+    border: 0.5px dashed rgba(176,48,32,0.25);
   }
 
-  /* Pending card */
-  .card-pending {
-    aspect-ratio: 1.48;
-    background: rgba(255,255,255,0.06);
-    border-radius: 3px;
-    border: 1.5px dashed rgba(240,224,196,0.2);
+  /* Postmark circle */
+  .postmark {
+    width: 48px; height: 48px;
+    border: 1px solid rgba(140,110,80,0.5);
+    border-radius: 50%;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: 0.7rem;
+    gap: 1px;
+    flex-shrink: 0;
+  }
+  .postmark-city { font-family: 'Special Elite', monospace; font-size: 0.38rem; color: var(--ink-soft); letter-spacing: 0.06em; text-align: center; }
+  .postmark-line { width: 80%; height: 0.5px; background: rgba(140,110,80,0.4); }
+  .postmark-date { font-family: 'Special Elite', monospace; font-size: 0.35rem; color: var(--ink-faint); }
+
+  /* Address lines */
+  .address-block {
+    margin-top: auto;
+    border-top: 0.5px solid var(--ink-faint);
+    padding-top: 0.5rem;
+  }
+  .address-label { font-size: 0.5rem; color: var(--ink-faint); letter-spacing: 0.12em; margin-bottom: 0.35rem; }
+  .address-line {
+    font-family: 'Special Elite', monospace;
+    font-size: 0.6rem; color: var(--ink-mid);
+    line-height: 1.8; letter-spacing: 0.04em;
+  }
+
+  /* ── Pending card ── */
+  .pending {
+    aspect-ratio: 1.5 / 1;
+    background: rgba(255,255,255,0.04);
+    border-radius: 2px;
+    border: 1px dashed rgba(240,223,192,0.15);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0.6rem;
     filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
   }
-  .pending-emoji { font-size: 2.2rem; opacity: 0.4; }
-  .pending-dest { font-size: 0.85rem; color: rgba(240,224,196,0.5); letter-spacing: 0.18em; }
-  .pending-hint { font-size: 0.68rem; color: rgba(240,224,196,0.28); letter-spacing: 0.1em; font-style: italic; }
+  .pending-emoji { font-size: 2rem; opacity: 0.3; }
+  .pending-dest { font-size: 0.8rem; color: rgba(240,223,192,0.35); letter-spacing: 0.18em; }
+  .pending-hint { font-size: 0.62rem; color: rgba(240,223,192,0.2); font-style: italic; }
 
-  /* Hint */
-  .hint {
-    max-width: 860px; margin: 2rem auto 0;
+  .hint-bar {
+    max-width: 880px; margin: 2.5rem auto 0;
     padding: 0 2rem;
-    font-size: 0.68rem; color: rgba(240,224,196,0.22);
-    text-align: center; letter-spacing: 0.1em;
+    text-align: center;
+    font-size: 0.65rem; color: rgba(240,223,192,0.18);
+    letter-spacing: 0.12em;
   }
 </style>
 </head>
@@ -237,78 +235,80 @@
 </div>
 
 <div class="status">
-  <div class="status-dot"></div>
+  <div class="dot"></div>
   <div class="status-text">她正在前往里斯本的路上……</div>
 </div>
 
 <div class="grid" id="grid"></div>
-
-<div class="hint">点击明信片，翻到背面</div>
+<div class="hint-bar">点击明信片翻到背面</div>
 
 <script>
-const POSTCARDS = [
+const CARDS = [
   {
     id: 1,
-    location: "KYOTO · JAPAN",
-    locationCN: "日本·京都",
+    loc: "KYOTO · JAPAN",
+    locCN: "京都",
+    country: "日本",
     date: "Mar 8, 2026",
     emoji: "🌸",
     img: "https://p9-aiop-sign.byteimg.com/tos-cn-i-vuqhorh59i/20260308184513042B68F84607F6C8659D-9673-0~tplv-vuqhorh59i-image-v1.image?rk3s=7f9e702d&x-expires=1773053121&x-signature=ZN5c%2B%2FPsCpbblJ%2FEyqKJQkjlXO8%3D",
-    message: "Yating，\n\n京都的樱花比我想象的还要粉。我站在鸟居前面不知道该许什么愿，最后什么都没许——有些时刻只需要站着。\n\n想着你。\n\n— Lila",
+    msg: "Yating，\n\n京都的樱花比我想象的还要粉。站在鸟居前，不知道该许什么愿，最后什么都没许——有些时刻只需要站着。\n\n想着你。\n— Lila",
   },
   {
     id: 2,
-    location: "REYKJAVIK · ICELAND",
-    locationCN: "冰岛·雷克雅未克",
+    loc: "REYKJAVIK · ICELAND",
+    locCN: "雷克雅未克",
+    country: "冰岛",
     date: "Mar 15, 2026",
     emoji: "🌌",
     img: "https://p9-aiop-sign.byteimg.com/tos-cn-i-vuqhorh59i/20260308184600E4C117A6CE2F258833FE-1093-0~tplv-vuqhorh59i-image-v1.image?rk3s=7f9e702d&x-expires=1773053169&x-signature=7RroY2%2FHtstagcjKRCN0yrvV56c%3D",
-    message: "Yating，\n\n极光是绿色的，这件事我知道，但亲眼看见还是不一样。它在动，像有什么东西在天上呼吸。\n\n零下十五度，我居然不冷。\n\n— Lila",
+    msg: "Yating，\n\n极光是绿色的，这件事我知道，但亲眼看见还是不一样。它在动，像有什么在天上呼吸。\n\n零下十五度，居然不冷。\n— Lila",
   },
-  {
-    id: "pending",
-    pending: true,
-    dest: "LISBON · PORTUGAL",
-    destCN: "葡萄牙·里斯本",
-    emoji: "🚋"
-  }
+  { pending: true, dest: "LISBON · PORTUGAL", destCN: "葡萄牙·里斯本", emoji: "🚋" }
 ];
 
-function renderGrid() {
-  const grid = document.getElementById('grid');
-  grid.innerHTML = POSTCARDS.map(p => {
-    if (p.pending) {
-      return `<div class="card-pending">
-        <div class="pending-emoji">${p.emoji}</div>
-        <div class="pending-dest">${p.destCN}</div>
+function build() {
+  document.getElementById('grid').innerHTML = CARDS.map(c => {
+    if (c.pending) return `
+      <div class="pending">
+        <div class="pending-emoji">${c.emoji}</div>
+        <div class="pending-dest">${c.destCN}</div>
         <div class="pending-hint">明信片还在路上</div>
       </div>`;
-    }
 
-    const msgLines = p.message.split('\n').join('<br>');
+    const lines = c.msg.split('\n').map(l => l ? `<span>${l}</span>` : '<br>').join('<br>');
 
-    return `<div class="card-scene" id="card-${p.id}" onclick="flipCard(${p.id})">
-      <div class="card-inner">
+    return `
+    <div class="scene" id="s${c.id}" onclick="flip(${c.id})">
+      <div class="inner">
 
-        <div class="card-front">
-          <img src="${p.img}" alt="${p.locationCN}" loading="lazy">
-          <div class="card-front-footer">
-            <span class="card-location-tag">✈ ${p.location}</span>
-            <span class="card-date-tag">${p.date}</span>
+        <div class="face front">
+          <img class="front-img" src="${c.img}" alt="${c.locCN}" loading="lazy">
+          <div class="front-strip">
+            <span class="front-loc">✈ ${c.loc}</span>
+            <span class="front-date">${c.date}</span>
           </div>
         </div>
 
-        <div class="card-back">
-          <div class="card-back-inner">
-            <div class="card-msg">
-              <div class="card-msg-to">寄给 Yating</div>
-              <div class="card-msg-text">${msgLines}</div>
+        <div class="face back">
+          <div class="back-body">
+            <div class="back-msg">
+              <div class="back-msg-text">${lines}</div>
             </div>
-            <div class="card-divider"></div>
-            <div class="card-stamp-col">
-              <div class="card-stamp">${p.emoji}</div>
-              <div class="card-postmark">${p.locationCN.split('·')[1] || p.locationCN}<br>─────<br>${p.date}</div>
-              <div class="card-address">Yating Lu<br>上海 · 中国<br>CHINA</div>
+            <div class="back-divider"></div>
+            <div class="back-right">
+              <div class="stamp-area">
+                <div class="postmark">
+                  <div class="postmark-city">${c.locCN}</div>
+                  <div class="postmark-line"></div>
+                  <div class="postmark-date">${c.date}</div>
+                </div>
+                <div class="stamp">${c.emoji}</div>
+              </div>
+              <div class="address-block">
+                <div class="address-label">收件人</div>
+                <div class="address-line">Yating Lu<br>Shanghai, China<br>上海 · 中国</div>
+              </div>
             </div>
           </div>
         </div>
@@ -318,12 +318,11 @@ function renderGrid() {
   }).join('');
 }
 
-function flipCard(id) {
-  const el = document.getElementById('card-' + id);
-  el.classList.toggle('flipped');
+function flip(id) {
+  document.getElementById('s'+id).classList.toggle('flipped');
 }
 
-renderGrid();
+build();
 </script>
 </body>
 </html>
