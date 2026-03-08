@@ -287,8 +287,8 @@ function render(){
     else cls+=' normal';
     el.className=cls;
 
-    el.innerHTML=`<span class="num">${d}</span>`
-      +`<span class="lunar">${jieqi ? `<span class="jieqi">${jieqi}</span>` : lunar}</span>`;
+    const subLine = jieqi ? '<span class="jieqi">'+jieqi+'</span>' : lunar;
+    el.innerHTML='<span class="num">'+d+'</span><span class="lunar">'+subLine+'</span>';
 
     el.addEventListener('click',()=>showInfo(date,k,holiday,workday,jieqi,lunar));
     grid.appendChild(el);
@@ -318,6 +318,6 @@ renderUpcoming();
 // auto select today
 const todayEl = document.querySelector('.day.today');
 if(todayEl) todayEl.click();
-
+</script>
 </body>
 </html>
