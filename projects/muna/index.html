@@ -174,33 +174,44 @@
 
   .day-cell:hover { background: var(--bg); }
 
-  .day-cell.period {
-    background: var(--period-bg);
+  .day-cell.ovulation {
+    background: none;
   }
-  .day-cell.period:hover { background: oklch(94% 0.035 22); }
-
-  .day-cell.period::before {
+  .day-cell.period {
+    background: none;
+  }
+  .day-cell.period:hover { background: var(--bg); }
+  .day-cell.period::after {
     content: '';
     position: absolute;
-    left: 0; top: 22%; bottom: 22%;
-    width: 2.5px;
-    border-radius: 0 2px 2px 0;
+    bottom: 2px; left: 10%; right: 10%;
+    height: 2.5px;
+    border-radius: 2px;
     background: var(--period-dot);
-    opacity: 0.65;
   }
 
   .day-cell.ovulation {
-    background: var(--ovulation-bg);
+    background: none;
   }
-  .day-cell.ovulation:hover { background: oklch(93% 0.026 250); }
-  .day-cell.ovulation::before {
+  .day-cell.ovulation:hover { background: var(--bg); }
+  .day-cell.ovulation::after {
     content: '';
     position: absolute;
-    left: 0; top: 22%; bottom: 22%;
-    width: 2.5px;
-    border-radius: 0 2px 2px 0;
+    bottom: 2px; left: 10%; right: 10%;
+    height: 2.5px;
+    border-radius: 2px;
     background: var(--ovulation-dot);
-    opacity: 0.6;
+  }
+
+  .day-cell.period-predicted::after {
+    content: '';
+    position: absolute;
+    bottom: 2px; left: 10%; right: 10%;
+    height: 2.5px;
+    border-radius: 2px;
+    background: transparent;
+    border-bottom: 2.5px dashed var(--period-dot);
+    opacity: 0.65;
   }
 
   .day-num {
@@ -248,15 +259,23 @@
   .legend-period {
     width: 10px; height: 10px;
     border-radius: 3px;
-    background: var(--period-bg);
-    border-left: 2px solid var(--period-dot);
+    background: transparent;
+    border-bottom: 2.5px solid var(--period-dot);
   }
 
   .legend-ovulation {
     width: 10px; height: 10px;
     border-radius: 3px;
-    background: var(--ovulation-bg);
-    border-left: 2px solid var(--ovulation-dot);
+    background: transparent;
+    border-bottom: 2.5px solid var(--ovulation-dot);
+  }
+
+  .legend-predicted {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    background: transparent;
+    border-bottom: 2.5px dashed var(--period-dot);
+    opacity: 0.65;
   }
 
   .legend-today {
@@ -620,6 +639,7 @@
       <div class="legend">
         <div class="legend-item"><div class="legend-period"></div><span>Period</span></div>
         <div class="legend-item"><div class="legend-ovulation"></div><span>Ovulation</span></div>
+        <div class="legend-item"><div class="legend-predicted"></div><span>Predicted</span></div>
         <div class="legend-item"><div class="legend-today"></div><span>Today</span></div>
         <div class="legend-faces" id="legendFaces"></div>
       </div>
@@ -923,9 +943,9 @@ const data = {
   26:{mood:4,period:false,ovulation:true},   // ovulation window
   27:{mood:4,period:false,ovulation:true},   // ovulation window
   28:{mood:3,period:false,ovulation:true},   // ovulation peak
-  29:{mood:null,period:false,ovulation:false},
-  30:{mood:null,period:false,ovulation:false},
-  31:{mood:null,period:false,ovulation:false},
+  29:{mood:null,period:false,ovulation:false,predicted:false},
+  30:{mood:null,period:false,ovulation:false,predicted:false},
+  31:{mood:null,period:false,ovulation:false,predicted:false},
 };
 const TODAY = 15;
 
@@ -936,24 +956,25 @@ function buildGrid() {
   const startOffset = firstDay === 0 ? 6 : firstDay - 1;
 
   for (let i = startOffset - 1; i >= 0; i--) {
-    grid.appendChild(makeCell(28 - i, false, false, false, true, null, false));
+    grid.appendChild(makeCell(28 - i, false, false, false, false, true, null, false));
   }
   for (let d = 1; d <= 31; d++) {
     const e = data[d] || null;
-    grid.appendChild(makeCell(d, e?.period||false, e?.ovulation||false, d===TODAY, false, e?.mood??null, d>TODAY));
+    grid.appendChild(makeCell(d, e?.period||false, e?.ovulation||false, e?.predicted||false, d===TODAY, false, e?.mood??null, d>TODAY));
   }
   const total = startOffset + 31;
   const rem = total % 7 === 0 ? 0 : 7 - (total % 7);
   for (let d = 1; d <= rem; d++) {
-    grid.appendChild(makeCell(d, false, false, false, true, null, false));
+    grid.appendChild(makeCell(d, false, false, false, false, true, null, false));
   }
 }
 
-function makeCell(day, isPeriod, isOvulation, isToday, isOther, mood, isFuture) {
+function makeCell(day, isPeriod, isOvulation, isPredicted, isToday, isOther, mood, isFuture) {
   const cell = document.createElement('div');
   cell.className = 'day-cell';
   if (isPeriod && !isOther) cell.classList.add('period');
   if (isOvulation && !isOther) cell.classList.add('ovulation');
+  if (isPredicted && !isOther) cell.classList.add('period-predicted');
   if (isToday) cell.classList.add('today');
   if (isOther) cell.classList.add('other-month');
   if (isFuture) cell.classList.add('future');
