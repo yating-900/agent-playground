@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muna Faces</title>
+<style>
+  body {
+    background: #faf8f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: -apple-system, sans-serif;
+    gap: 40px;
+  }
+  h2 { color: #555; font-weight: 400; font-size: 14px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .row {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .face-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .label {
+    font-size: 11px;
+    color: #999;
+  }
+  /* sizes to compare */
+  .sz-big svg { width: 64px; height: 64px; }
+  .sz-cal svg { width: 22px; height: 22px; }
+</style>
+</head>
+<body>
+
+<h2>Muna mood faces — large preview</h2>
+<div class="row sz-big" id="bigRow"></div>
+
+<h2>Calendar size (22px)</h2>
+<div class="row sz-cal" id="calRow"></div>
+
+<script>
+// ── New face design ────────────────────────────────────────────
+// Rounder, cuter, thicker strokes, bigger eyes, more expressive
+// Each face has a pastel base with a slightly darker tinted circle as cheek/blush
+
+const FACES = [
+  // 0: very sad
+  {
+    bg: '#f7d5d0',        // dusty rose
+    stroke: '#b85c52',
+    eyes: 'open-sad',     // teardrop bottom
+    mouth: 'deep-frown',
+    brow: 'v-frown',
+    extras: 'tear',
+  },
+  // 1: sad
+  {
+    bg: '#fce0cc',        // peach
+    stroke: '#c07040',
+    eyes: 'open',
+    mouth: 'frown',
+    brow: 'flat-frown',
+    extras: null,
+  },
+  // 2: neutral
+  {
+    bg: '#f2ead8',        // warm cream
+    stroke: '#9a7e5a',
+    eyes: 'open',
+    mouth: 'flat',
+    brow: 'flat',
+    extras: null,
+  },
+  // 3: happy
+  {
+    bg: '#cdecd8',        // mint green
+    stroke: '#3d8a58',
+    eyes: 'open',
+    mouth: 'smile',
+    brow: 'flat',
+    extras: 'cheeks',
+  },
+  // 4: very happy
+  {
+    bg: '#fde8b8',        // warm yellow
+    stroke: '#b87820',
+    eyes: 'closed-happy',
+    mouth: 'big-smile',
+    brow: 'flat',
+    extras: 'cheeks-big',
+  },
+];
+
+const LABELS = ['Very sad', 'Sad', 'Okay', 'Happy', 'Very happy'];
+
+function face(cfg, size) {
+  const s = size;
+  const cx = s/2, cy = s/2;
+  const r = s/2 - 1;
+
+  // proportions (relative to size)
+  const eyeOffX = s * 0.19;
+  const eyeOffY = s * -0.08;
+  const eyeR    = s * 0.065;
+  const pupilR  = s * 0.028;
+  const sw      = Math.max(1, s * 0.055);  // stroke width
+  const mouthY  = cy + s * 0.18;
+  const mouthW  = s * 0.22;
+  const browY   = cy + eyeOffY - eyeR - s*0.06;
+
+  let parts = [];
+
+  // background circle
+  parts.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${cfg.bg}"/>`);
+
+  // extras behind eyes (cheeks)
+  if (cfg.extras === 'cheeks' || cfg.extras === 'cheeks-big') {
+    const cr = cfg.extras === 'cheeks-big' ? s*0.11 : s*0.09;
+    const chkAlpha = 0.45;
+    // tinted cheeks
+    const chkColor = cfg.stroke;
+    parts.push(`<circle cx="${cx - eyeOffX - s*0.04}" cy="${cy + s*0.12}" r="${cr}" fill="${chkColor}" opacity="${chkAlpha}"/>`);
+    parts.push(`<circle cx="${cx + eyeOffX + s*0.04}" cy="${cy + s*0.12}" r="${cr}" fill="${chkColor}" opacity="${chkAlpha}"/>`);
+  }
+
+  if (cfg.extras === 'tear') {
+    // small teardrop under left eye
+    const tx = cx - eyeOffX + s*0.02;
+    const ty = cy + eyeOffY + eyeR + s*0.04;
+    parts.push(`<ellipse cx="${tx}" cy="${ty + s*0.04}" rx="${s*0.04}" ry="${s*0.055}" fill="${cfg.stroke}" opacity="0.35"/>`);
+  }
+
+  // eyebrows
+  if (cfg.brow === 'v-frown') {
+    // inner ends raised → angry/sad V shape
+    parts.push(`<path d="M${cx-eyeOffX-s*0.1} ${browY-s*0.04} L${cx-eyeOffX+s*0.08} ${browY+s*0.02}" stroke="${cfg.stroke}" stroke-width="${sw*0.8}" stroke-linecap="round" fill="none"/>`);
+    parts.push(`<path d="M${cx+eyeOffX-s*0.08} ${browY+s*0.02} L${cx+eyeOffX+s*0.1} ${browY-s*0.04}" stroke="${cfg.stroke}" stroke-width="${sw*0.8}" stroke-linecap="round" fill="none"/>`);
+  } else if (cfg.brow === 'flat-frown') {
+    // slight inward tilt
+    parts.push(`<path d="M${cx-eyeOffX-s*0.09} ${browY-s*0.01} L${cx-eyeOffX+s*0.08} ${browY+s*0.03}" stroke="${cfg.stroke}" stroke-width="${sw*0.8}" stroke-linecap="round" fill="none"/>`);
+    parts.push(`<path d="M${cx+eyeOffX-s*0.08} ${browY+s*0.03} L${cx+eyeOffX+s*0.09} ${browY-s*0.01}" stroke="${cfg.stroke}" stroke-width="${sw*0.8}" stroke-linecap="round" fill="none"/>`);
+  }
+  // 'flat' brow: no brows (cleaner/neutral)
+
+  // eyes
+  if (cfg.eyes === 'open' || cfg.eyes === 'open-sad') {
+    // white of eye + pupil
+    parts.push(`<circle cx="${cx-eyeOffX}" cy="${cy+eyeOffY}" r="${eyeR}" fill="white" opacity="0.85"/>`);
+    parts.push(`<circle cx="${cx+eyeOffX}" cy="${cy+eyeOffY}" r="${eyeR}" fill="white" opacity="0.85"/>`);
+    // pupil
+    const pOff = cfg.eyes === 'open-sad' ? s*0.01 : 0; // pupils slightly down for sad
+    parts.push(`<circle cx="${cx-eyeOffX}" cy="${cy+eyeOffY+pOff}" r="${pupilR}" fill="${cfg.stroke}"/>`);
+    parts.push(`<circle cx="${cx+eyeOffX}" cy="${cy+eyeOffY+pOff}" r="${pupilR}" fill="${cfg.stroke}"/>`);
+    // shine dot
+    parts.push(`<circle cx="${cx-eyeOffX+pupilR*0.6}" cy="${cy+eyeOffY+pOff-pupilR*0.6}" r="${pupilR*0.45}" fill="white"/>`);
+    parts.push(`<circle cx="${cx+eyeOffX+pupilR*0.6}" cy="${cy+eyeOffY+pOff-pupilR*0.6}" r="${pupilR*0.45}" fill="white"/>`);
+  } else if (cfg.eyes === 'closed-happy') {
+    // arc ^^ eyes
+    const ey = cy + eyeOffY;
+    parts.push(`<path d="M${cx-eyeOffX-eyeR} ${ey+eyeR*0.3} Q${cx-eyeOffX} ${ey-eyeR*1.2} ${cx-eyeOffX+eyeR} ${ey+eyeR*0.3}" stroke="${cfg.stroke}" stroke-width="${sw}" stroke-linecap="round" fill="none"/>`);
+    parts.push(`<path d="M${cx+eyeOffX-eyeR} ${ey+eyeR*0.3} Q${cx+eyeOffX} ${ey-eyeR*1.2} ${cx+eyeOffX+eyeR} ${ey+eyeR*0.3}" stroke="${cfg.stroke}" stroke-width="${sw}" stroke-linecap="round" fill="none"/>`);
+  }
+
+  // mouth
+  if (cfg.mouth === 'deep-frown') {
+    parts.push(`<path d="M${cx-mouthW} ${mouthY+s*0.04} Q${cx} ${mouthY-s*0.12} ${cx+mouthW} ${mouthY+s*0.04}" stroke="${cfg.stroke}" stroke-width="${sw}" stroke-linecap="round" fill="none"/>`);
+  } else if (cfg.mouth === 'frown') {
+    parts.push(`<path d="M${cx-mouthW} ${mouthY+s*0.02} Q${cx} ${mouthY-s*0.07} ${cx+mouthW} ${mouthY+s*0.02}" stroke="${cfg.stroke}" stroke-width="${sw}" stroke-linecap="round" fill="none"/>`);
+  } else if (cfg.mouth === 'flat') {
+    parts.push(`<line x1="${cx-mouthW}" y1="${mouthY}" x2="${cx+mouthW}" y2="${mouthY}" stroke="${cfg.stroke}" stroke-width="${sw}" stroke-linecap="round"/>`);
+  } else if (cfg.mouth === 'smile') {
+    parts.push(`<path d="M${cx-mouthW} ${mouthY-s*0.02} Q${cx} ${mouthY+s*0.12} ${cx+mouthW} ${mouthY-s*0.02}" stroke="${cfg.stroke}" stroke-width="${sw}" stroke-linecap="round" fill="none"/>`);
+  } else if (cfg.mouth === 'big-smile') {
+    // filled smile
+    parts.push(`<path d="M${cx-mouthW} ${mouthY-s*0.04} Q${cx} ${mouthY+s*0.16} ${cx+mouthW} ${mouthY-s*0.04}" stroke="${cfg.stroke}" stroke-width="${sw}" stroke-linecap="round" fill="${cfg.bg}"/>`);
+    // teeth hint
+    parts.push(`<path d="M${cx-mouthW*0.55} ${mouthY+s*0.01} Q${cx} ${mouthY+s*0.14} ${cx+mouthW*0.55} ${mouthY+s*0.01}" fill="${cfg.stroke}" opacity="0.12"/>`);
+  }
+
+  return `<svg viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">${parts.join('')}</svg>`;
+}
+
+// render
+const sizes = { bigRow: 64, calRow: 22 };
+for (const [id, sz] of Object.entries(sizes)) {
+  const row = document.getElementById(id);
+  FACES.forEach((cfg, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'face-wrap';
+    wrap.innerHTML = face(cfg, sz);
+    if (sz === 64) {
+      const lbl = document.createElement('div');
+      lbl.className = 'label';
+      lbl.textContent = LABELS[i];
+      wrap.appendChild(lbl);
+    }
+    row.appendChild(wrap);
+  });
+}
+</script>
+</body>
+</html>
