@@ -17,7 +17,9 @@
     --ink-muted: oklch(72% 0.010 60);
     --period-bg: oklch(96% 0.025 22);
     --period-dot: oklch(62% 0.16 22);
-    --today-ring: oklch(55% 0.12 250);
+    --ovulation-bg: oklch(95% 0.018 250);
+    --ovulation-dot: oklch(55% 0.14 250);
+    --today-ring: oklch(45% 0.10 270);
     --border: oklch(90% 0.008 60);
   }
 
@@ -187,6 +189,20 @@
     opacity: 0.65;
   }
 
+  .day-cell.ovulation {
+    background: var(--ovulation-bg);
+  }
+  .day-cell.ovulation:hover { background: oklch(93% 0.026 250); }
+  .day-cell.ovulation::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 22%; bottom: 22%;
+    width: 2.5px;
+    border-radius: 0 2px 2px 0;
+    background: var(--ovulation-dot);
+    opacity: 0.6;
+  }
+
   .day-num {
     font-size: 10.5px;
     font-weight: 500;
@@ -234,6 +250,13 @@
     border-radius: 3px;
     background: var(--period-bg);
     border-left: 2px solid var(--period-dot);
+  }
+
+  .legend-ovulation {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    background: var(--ovulation-bg);
+    border-left: 2px solid var(--ovulation-dot);
   }
 
   .legend-today {
@@ -566,7 +589,7 @@
     <div class="header">
       <div class="header-left">
         <h1>March</h1>
-        <div class="subtitle">Luteal phase · Day 4</div>
+        <div class="subtitle">Period · Day 2 of 5</div>
       </div>
       <div class="avatar">🌙</div>
     </div>
@@ -574,7 +597,7 @@
     <div class="phase-bar">
       <div class="phase-pill">
         <div class="phase-dot"></div>
-        Period ends in <strong>2 days</strong> · Next cycle Mar 28
+        Period ends in <strong>3 days</strong> · Ovulation ~Mar 28
       </div>
     </div>
 
@@ -596,6 +619,7 @@
       <div class="days-grid" id="grid"></div>
       <div class="legend">
         <div class="legend-item"><div class="legend-period"></div><span>Period</span></div>
+        <div class="legend-item"><div class="legend-ovulation"></div><span>Ovulation</span></div>
         <div class="legend-item"><div class="legend-today"></div><span>Today</span></div>
         <div class="legend-faces" id="legendFaces"></div>
       </div>
@@ -670,7 +694,7 @@
           <div class="settings-icon" style="background:#fde8c8">🗓</div>
           Last period start
         </div>
-        <span class="settings-val">Mar 8</span>
+        <span class="settings-val">Mar 14</span>
         <span class="chevron">›</span>
       </div>
       <div class="settings-row">
@@ -863,15 +887,47 @@ function makeFaceSVG(mood, size = 18) {
   </svg>`;
 }
 
-// ── Data ──────────────────────────────────────────────────────
+// ── Cycle data ────────────────────────────────────────────────
+// Yating's real cycle: period starts 14th each month (recent 2), 5 days
+// Prior 2 months: started 12th, 5 days
+// Cycle length ~28 days → ovulation ~day 14 of cycle = around day 28 of March
+// March: period 14-18; ovulation window ~26-28 (peak day 28)
+// mood: 0=very sad, 1=sad, 2=neutral, 3=happy, 4=very happy (simulated)
+
 const data = {
-  1:{mood:2,period:false}, 2:{mood:1,period:false}, 3:{mood:0,period:false},
-  4:{mood:1,period:false}, 5:{mood:2,period:false}, 6:{mood:3,period:false},
-  7:{mood:3,period:false}, 8:{mood:2,period:true},  9:{mood:1,period:true},
-  10:{mood:1,period:true}, 11:{mood:2,period:true}, 12:{mood:2,period:true},
-  13:{mood:null,period:true}, // today
+  1: {mood:3,period:false,ovulation:false},
+  2: {mood:3,period:false,ovulation:false},
+  3: {mood:4,period:false,ovulation:false},
+  4: {mood:3,period:false,ovulation:false},
+  5: {mood:3,period:false,ovulation:false},
+  6: {mood:2,period:false,ovulation:false},
+  7: {mood:2,period:false,ovulation:false},
+  8: {mood:2,period:false,ovulation:false},
+  9: {mood:1,period:false,ovulation:false},
+  10:{mood:1,period:false,ovulation:false},
+  11:{mood:1,period:false,ovulation:false},
+  12:{mood:0,period:false,ovulation:false},  // PMS
+  13:{mood:0,period:false,ovulation:false},  // PMS
+  14:{mood:1,period:true, ovulation:false},  // period starts
+  15:{mood:1,period:true, ovulation:false},
+  16:{mood:2,period:true, ovulation:false},
+  17:{mood:2,period:true, ovulation:false},
+  18:{mood:2,period:true, ovulation:false},  // period ends
+  19:{mood:3,period:false,ovulation:false},
+  20:{mood:3,period:false,ovulation:false},
+  21:{mood:3,period:false,ovulation:false},
+  22:{mood:4,period:false,ovulation:false},
+  23:{mood:4,period:false,ovulation:false},
+  24:{mood:3,period:false,ovulation:false},
+  25:{mood:3,period:false,ovulation:false},
+  26:{mood:4,period:false,ovulation:true},   // ovulation window
+  27:{mood:4,period:false,ovulation:true},   // ovulation window
+  28:{mood:3,period:false,ovulation:true},   // ovulation peak
+  29:{mood:null,period:false,ovulation:false},
+  30:{mood:null,period:false,ovulation:false},
+  31:{mood:null,period:false,ovulation:false},
 };
-const TODAY = 13;
+const TODAY = 15;
 
 // ── Build calendar grid ────────────────────────────────────────
 function buildGrid() {
@@ -880,23 +936,24 @@ function buildGrid() {
   const startOffset = firstDay === 0 ? 6 : firstDay - 1;
 
   for (let i = startOffset - 1; i >= 0; i--) {
-    grid.appendChild(makeCell(28 - i, false, false, true, null, false));
+    grid.appendChild(makeCell(28 - i, false, false, false, true, null, false));
   }
   for (let d = 1; d <= 31; d++) {
     const e = data[d] || null;
-    grid.appendChild(makeCell(d, e?.period||false, d===TODAY, false, e?.mood??null, d>TODAY));
+    grid.appendChild(makeCell(d, e?.period||false, e?.ovulation||false, d===TODAY, false, e?.mood??null, d>TODAY));
   }
   const total = startOffset + 31;
   const rem = total % 7 === 0 ? 0 : 7 - (total % 7);
   for (let d = 1; d <= rem; d++) {
-    grid.appendChild(makeCell(d, false, false, true, null, false));
+    grid.appendChild(makeCell(d, false, false, false, true, null, false));
   }
 }
 
-function makeCell(day, isPeriod, isToday, isOther, mood, isFuture) {
+function makeCell(day, isPeriod, isOvulation, isToday, isOther, mood, isFuture) {
   const cell = document.createElement('div');
   cell.className = 'day-cell';
   if (isPeriod && !isOther) cell.classList.add('period');
+  if (isOvulation && !isOther) cell.classList.add('ovulation');
   if (isToday) cell.classList.add('today');
   if (isOther) cell.classList.add('other-month');
   if (isFuture) cell.classList.add('future');
