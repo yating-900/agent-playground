@@ -102,7 +102,6 @@
     background: var(--surface);
     border-radius: 20px;
     border: 1px solid var(--border);
-    overflow: hidden;
   }
 
   .month-nav {
@@ -169,7 +168,8 @@
     position: relative;
     cursor: pointer;
     transition: background 0.12s;
-    padding: 3px;
+    padding: 2px 2px 6px;
+    min-height: 48px;
   }
 
   .day-cell:hover { background: var(--bg); }
@@ -184,7 +184,7 @@
   .day-cell.period::after {
     content: '';
     position: absolute;
-    bottom: 2px; left: 10%; right: 10%;
+    bottom: 3px; left: 12%; right: 12%;
     height: 2.5px;
     border-radius: 2px;
     background: var(--period-dot);
@@ -197,7 +197,7 @@
   .day-cell.ovulation::after {
     content: '';
     position: absolute;
-    bottom: 2px; left: 10%; right: 10%;
+    bottom: 3px; left: 12%; right: 12%;
     height: 2.5px;
     border-radius: 2px;
     background: var(--ovulation-dot);
@@ -206,7 +206,7 @@
   .day-cell.period-predicted::after {
     content: '';
     position: absolute;
-    bottom: 2px; left: 10%; right: 10%;
+    bottom: 3px; left: 12%; right: 12%;
     height: 2.5px;
     border-radius: 2px;
     background: transparent;
